@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createEnvio } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 const FORM_INICIAL = {
   remitente: '',
@@ -17,6 +18,8 @@ function NuevoEnvio() {
   const [form, setForm] = useState(FORM_INICIAL);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  // eslint-disable-next-line no-unused-vars
+  const { user } = useAuth();
 
   const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -25,11 +28,12 @@ function NuevoEnvio() {
       setError('Remitente y Destinatario son obligatorios.');
       return;
     }
+
     try {
-      await createEnvio(form);
+      await createEnvio(form); 
       navigate('/');
-    } catch {
-      setError('Error al crear el envío. Verificá que el backend esté activo.');
+    } catch (err) {
+      setError(err.message || 'Error de conexión con el servidor.');
     }
   };
 
@@ -45,7 +49,7 @@ function NuevoEnvio() {
           <button className="btn btn-secondary" onClick={() => navigate('/')}>CANCELAR</button>
         </div>
 
-        {error && <p className="error-msg">{error}</p>}
+        {error && <p className="error-msg" style={{color: 'red', marginBottom: '10px'}}>{error}</p>}
 
         <div className="form-grid">
           <div className="form-group">
@@ -60,22 +64,22 @@ function NuevoEnvio() {
 
           <div className="form-group form-full">
             <label>Descripción de la carga</label>
-            <input name="descripcionCarga" value={form.descripcionCarga} onChange={handleChange} placeholder="Medicamento, lote, cantidad, condiciones de temperatura..." />
+            <input name="descripcionCarga" value={form.descripcionCarga} onChange={handleChange} />
           </div>
 
           <div className="form-group form-full">
             <label>Dirección de entrega</label>
-            <input name="direccionEntrega" value={form.direccionEntrega} onChange={handleChange} placeholder="Calle, número, localidad..." />
+            <input name="direccionEntrega" value={form.direccionEntrega} onChange={handleChange} />
           </div>
 
           <div className="form-group">
             <label>Origen</label>
-            <input name="origen" value={form.origen} onChange={handleChange} placeholder="Ciudad o provincia de origen" />
+            <input name="origen" value={form.origen} onChange={handleChange} />
           </div>
 
           <div className="form-group">
             <label>Destino</label>
-            <input name="destino" value={form.destino} onChange={handleChange} placeholder="Ciudad o provincia de destino" />
+            <input name="destino" value={form.destino} onChange={handleChange} />
           </div>
 
           <div className="form-group">
@@ -85,7 +89,7 @@ function NuevoEnvio() {
 
           <div className="form-group form-full">
             <label>Observaciones</label>
-            <textarea name="observaciones" value={form.observaciones} onChange={handleChange} rows="3" placeholder="Cadena de frío, manipulación especial, instrucciones adicionales..." />
+            <textarea name="observaciones" value={form.observaciones} onChange={handleChange} rows="3" />
           </div>
         </div>
       </div>

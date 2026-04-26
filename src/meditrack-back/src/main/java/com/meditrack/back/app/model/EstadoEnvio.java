@@ -1,11 +1,14 @@
 package com.meditrack.back.app.model;
 
 public enum EstadoEnvio {
-    
-    CREADO,
+    PENDIENTE,
+    ASIGNADO,
+    EN_PREPARACION,
     EN_TRANSITO,
-    EN_DEPOSITO,
-    ENTREGADO;
+    EN_PUNTO_DE_ENTREGA,
+    ENTREGADO,
+    INCIDENTE_REPORTADO,
+    CANCELADO;
 
     public EstadoEnvio siguiente() {
         EstadoEnvio[] valores = values();

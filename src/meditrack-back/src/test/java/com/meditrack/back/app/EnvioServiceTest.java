@@ -1,12 +1,11 @@
 package com.meditrack.back.app;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.util.Map;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import com.meditrack.back.app.model.Envio;
 import com.meditrack.back.app.model.EstadoEnvio;
 import com.meditrack.back.app.service.EnvioService;
@@ -14,6 +13,7 @@ import com.meditrack.back.app.service.EnvioService;
 class EnvioServiceTest {
 
     private EnvioService service;
+    private final String USUARIO_TEST = "admin_test";
 
     @BeforeEach
     void setUp() {
@@ -21,48 +21,71 @@ class EnvioServiceTest {
     }
 
     @Test
-    void listarTodos_retornaDatosSeed() {
-        assertEquals(3, service.listarTodos().size());
+    void listarTodos_inicialmenteVacio() {
+        assertEquals(0, service.listarTodos().size());
     }
 
     @Test
-    void crear_agregaEnvioEnEstadoCREADO() {
-        Map<String, String> body = Map.of("destinatario", "Juan Pérez", "remitente", "Test");
-        Envio nuevo = service.crear(body);
+    void crear_agregaEnvioEnEstadoPENDIENTE() {
+        Map<String, String> body = Map.of(
+            "destinatario", "Juan Pérez", 
+            "remitente", "Laboratorio Central",
+            "direccionEntrega", "Calle Falsa 123",
+            "prioridad", "ALTA"
+        );
+        
+        Envio nuevo = service.crear(body, USUARIO_TEST); 
+        
+        assertNotNull(nuevo.getId());
         assertEquals("Juan Pérez", nuevo.getDestinatario());
-        assertEquals(EstadoEnvio.CREADO, nuevo.getEstado());
-        assertEquals(4, service.listarTodos().size());
+        assertEquals(EstadoEnvio.PENDIENTE, nuevo.getEstado());
+        assertEquals(USUARIO_TEST, nuevo.getUsuarioResponsable());
+        assertEquals(1, service.listarTodos().size());
     }
 
     @Test
-    void cambiarEstado_transicionValida() {
+    void actualizarEstado_cambiaEstadoCorrectamente() {
         Map<String, String> body = Map.of("destinatario", "Test", "remitente", "Test");
-        Envio envio = service.crear(body);
-        Envio actualizado = service.cambiarEstado(envio.getId(), EstadoEnvio.EN_TRANSITO, "2026-03-28", "10:00", "admin");
-        assertEquals(EstadoEnvio.EN_TRANSITO, actualizado.getEstado());
+        Envio envio = service.crear(body, USUARIO_TEST);
+        
+        Envio actualizado = service.actualizarEstado(envio.getId(), EstadoEnvio.ASIGNADO, USUARIO_TEST);
+        
+        assertEquals(EstadoEnvio.ASIGNADO, actualizado.getEstado());
+        assertEquals(USUARIO_TEST, actualizado.getUsuarioResponsable());
     }
 
     @Test
-    void cambiarEstado_transicionInvalida_lanzaExcepcion() {
-        Map<String, String> body = Map.of("destinatario", "Test", "remitente", "Test");
-        Envio envio = service.crear(body);
-        assertThrows(IllegalArgumentException.class, () ->
-            service.cambiarEstado(envio.getId(), EstadoEnvio.EN_DEPOSITO, "2026-03-28", "10:00", "admin")
+    void actualizarEstado_idInexistente_lanzaExcepcion() {
+        assertThrows(RuntimeException.class, () -> 
+            service.actualizarEstado("NON-EXISTENT-ID", EstadoEnvio.EN_TRANSITO, USUARIO_TEST)
         );
     }
 
     @Test
-    void cambiarEstado_estadoFinal_lanzaExcepcion() {
-        Envio envio = service.obtenerPorId("3"); // EN_SUCURSAL en el seed
-        service.cambiarEstado(envio.getId(), EstadoEnvio.ENTREGADO, "2026-03-28", "10:00", "admin");
-        assertThrows(IllegalStateException.class, () ->
-            service.cambiarEstado(envio.getId(), EstadoEnvio.ENTREGADO, "2026-03-28", "10:00", "admin")
-        );
+    void auditoria_registraFechaYHoraAutomaticamente() {
+        Map<String, String> body = Map.of("destinatario", "Test Auditoria", "remitente", "Test");
+        Envio nuevo = service.crear(body, USUARIO_TEST);
+        
+        assertNotNull(nuevo.getFechaCreacion());
+        assertNotNull(nuevo.getHoraCreacion());
+        assertEquals(USUARIO_TEST, nuevo.getUsuarioResponsable());
     }
 
     @Test
-    void obtenerPorId_noExiste_lanzaExcepcion() {
-        assertThrows(RuntimeException.class, () -> service.obtenerPorId("999"));
+    void estados_todosLosNuevosEstadosSonAccesibles() {
+        Map<String, String> body = Map.of("destinatario", "Test", "remitente", "Test");
+        Envio envio = service.crear(body, USUARIO_TEST);
+        
+        service.actualizarEstado(envio.getId(), EstadoEnvio.EN_PREPARACION, USUARIO_TEST);
+        assertEquals(EstadoEnvio.EN_PREPARACION, envio.getEstado());
+        
+        service.actualizarEstado(envio.getId(), EstadoEnvio.EN_PUNTO_DE_ENTREGA, USUARIO_TEST);
+        assertEquals(EstadoEnvio.EN_PUNTO_DE_ENTREGA, envio.getEstado());
+        
+        service.actualizarEstado(envio.getId(), EstadoEnvio.INCIDENTE_REPORTADO, USUARIO_TEST);
+        assertEquals(EstadoEnvio.INCIDENTE_REPORTADO, envio.getEstado());
+        
+        service.actualizarEstado(envio.getId(), EstadoEnvio.CANCELADO, USUARIO_TEST);
+        assertEquals(EstadoEnvio.CANCELADO, envio.getEstado());
     }
-
 }

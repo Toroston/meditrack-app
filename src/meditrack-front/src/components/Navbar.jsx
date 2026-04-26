@@ -7,27 +7,40 @@ function Navbar() {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await apiLogout();
-    logout();
-    navigate('/login');
+    try {
+      await apiLogout();
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    } finally {
+      logout();
+      navigate('/login');
+    }
   };
 
   if (!user) return null;
 
   return (
-    <div className="navbar">
-      <span className="navbar-brand">MediTrack</span>
-      <div className="navbar-user">
-        <span>{user.nombre}</span>
-        <span className={`badge-role badge-role-${user.role.toLowerCase()}`}>{user.role}</span>
-        <button
-          className="btn btn-secondary"
+    <nav className="navbar">
+      <div className="navbar-brand">MediTrack</div>
+      
+      <div className="navbar-user-section">
+        <div style={{ textAlign: 'right' }}>
+          <span style={{ fontSize: '13px', fontWeight: 'bold', display: 'block', color: 'var(--text-black)' }}>
+            {user.nombre}
+          </span>
+          <span className={`badge badge-${user.role}`} style={{ fontSize: '10px' }}>
+            {user.role}
+          </span>
+        </div>
+        <button 
+          className="btn btn-secondary" 
           onClick={handleLogout}
+          style={{ marginLeft: '10px' }}
         >
           SALIR
         </button>
       </div>
-    </div>
+    </nav>
   );
 }
 
