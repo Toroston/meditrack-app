@@ -1,16 +1,23 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { getEnvioById, updateEstadoEnvio } from '../services/api';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { getEnvioById, updateEstadoEnvio, cancelarEnvio } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import ModalHistorial from '../components/ModalHistorial';
 import StatusLine from '../components/StatusLine';
 import ModalCancelacion from '../components/ModalCancelacion';
-import { cancelarEnvio } from '../services/api';
 
-const ORDEN_ESTADOS = [
-  'PENDIENTE', 'ASIGNADO', 'EN_PREPARACION', 'EN_TRANSITO', 
-  'EN_PUNTO_DE_ENTREGA', 'INCIDENTE_REPORTADO', 'ENTREGADO', 'CANCELADO'
-];
+const ESTADO_COLORS = {
+  PENDIENTE: '#6b7280',
+  ASIGNADO: '#4338CA',
+  EN_PREPARACION: '#f59e0b',
+  EN_TRANSITO: '#3b82f6',
+  EN_PUNTO_DE_ENTREGA: '#06b6d4',
+  INCIDENTE_REPORTADO: '#ef4444',
+  ENTREGADO: '#10b981',
+  CANCELADO: '#000000'
+};
+
+const ORDEN_ESTADOS = Object.keys(ESTADO_COLORS);
 
 function ahora() {
   const d = new Date();
@@ -23,24 +30,48 @@ function ahora() {
 function DetalleEnvio() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
+  
   const [envio, setEnvio] = useState(null);
   const [error, setError] = useState('');
   const [modalAbierto, setModalAbierto] = useState(false);
   const [historialAbierto, setHistorialAbierto] = useState(false);
+  const [showSnackbar, setShowSnackbar] = useState(false);
   const [modalForm, setModalForm] = useState({ nuevoEstado: '', fecha: '', hora: '', usuario: '' });
   const [modalError, setModalError] = useState('');
   const [cancelacionAbierta, setCancelacionAbierta] = useState(false);
 
-  useEffect(() => {
+useEffect(() => {
     getEnvioById(id)
       .then(data => {
         setEnvio(data);
         const { fecha, hora } = ahora();
-        setModalForm({ nuevoEstado: data.estado, fecha, hora, usuario: user?.nombre || '' });
+        setModalForm({ 
+          nuevoEstado: data.estado, 
+          fecha, 
+          hora, 
+          usuario: user?.nombre || '' 
+        });
       })
       .catch(() => setError('Envío no encontrado.'));
-  }, [id, user?.nombre]);
+    if (location.state?.editSuccess) {
+      const showTimer = setTimeout(() => {
+        setShowSnackbar(true);
+      }, 100);
+
+      window.history.replaceState({}, document.title);
+
+      const hideTimer = setTimeout(() => {
+        setShowSnackbar(false);
+      }, 3100);
+
+      return () => {
+        clearTimeout(showTimer);
+        clearTimeout(hideTimer);
+      };
+    }
+  }, [id, user?.nombre, location.state]);
 
   const abrirModalEstado = () => {
     const { fecha, hora } = ahora();
@@ -59,20 +90,65 @@ function DetalleEnvio() {
     }
   };
 
-  const handleConfirmarCancelacion = async (motivo,firma) => {
-    try{
+  const handleConfirmarCancelacion = async (motivo, firma) => {
+    try {
       const actualizado = await cancelarEnvio(id, motivo, firma);
       setEnvio(actualizado);
       setCancelacionAbierta(false);
     } catch (e) {
       alert(e.message);
     }
-  }
+  };
+
+  const getBadgeStyle = (estado) => {
+    const color = ESTADO_COLORS[estado] || '#6b7280';
+    return {
+      backgroundColor: `${color}15`,
+      color: color,
+      padding: '6px 14px',
+      borderRadius: '20px',
+      fontSize: '12px',
+      fontWeight: '800',
+      border: `1px solid ${color}40`,
+      textTransform: 'uppercase'
+    };
+  };
 
   if (!envio) return <div className="container"><p>{error || 'Cargando...'}</p></div>;
 
   return (
     <div className="container">
+      <style>
+        {`
+          .snackbar {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #2563EB;
+            color: white;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            z-index: 9999;
+            animation: fadeInDown 0.4s ease-out;
+          }
+          @keyframes fadeInDown {
+            from { top: -50px; opacity: 0; }
+            to { top: 20px; opacity: 1; }
+          }
+          .info-row-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+          }
+        `}
+      </style>
+
+      {showSnackbar && <div className="snackbar">¡Envío editado correctamente!</div>}
+
       <div className="page-header-row" style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '24px' }}>
         <button className="btn btn-secondary" onClick={() => navigate('/')}>VOLVER</button>
         <h1 style={{ fontSize: '24px', fontWeight: '800', color: '#111827' }}>Detalle del envío</h1>
@@ -80,21 +156,29 @@ function DetalleEnvio() {
 
       <StatusLine estadoActual={envio.estado} />
 
-      <div className="card detail-main-card" style={{ position: 'relative', paddingBottom: '80px' }}>
-        <div className="detail-top-grid">
+      <div className="card detail-main-card" style={{ position: 'relative', paddingBottom: '80px', paddingTop: '30px' }}>
+        
+        <div className="info-row-grid">
           <div className="detail-field">
             <label>TRACKING ID</label>
-            <span>{envio.id}</span>
+            <span style={{ fontWeight: 'bold', color: '#2563EB' }}>{envio.id}</span>
           </div>
           <div className="detail-field">
             <label>ESTADO</label>
-            <div className="status-action-row" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span className={`badge badge-${envio.estado}`}>{envio.estado?.replace(/_/g, ' ')}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span style={getBadgeStyle(envio.estado)}>{envio.estado?.replace(/_/g, ' ')}</span>
               <button className="btn btn-primary btn-sm" onClick={abrirModalEstado} style={{ backgroundColor: '#10B981', border: 'none' }}>
-                Cambiar estado ▾
+                ▾
               </button>
             </div>
           </div>
+          <div className="detail-field">
+            <label>DESCRIPCIÓN DE LA CARGA</label>
+            <span>{envio.descripcionCarga || '-'}</span>
+          </div>
+        </div>
+
+        <div className="info-row-grid">
           <div className="detail-field">
             <label>REMITENTE</label>
             <span>{envio.remitente || '-'}</span>
@@ -103,50 +187,56 @@ function DetalleEnvio() {
             <label>DESTINATARIO</label>
             <span>{envio.destinatario || '-'}</span>
           </div>
-        </div>
-
-        <div className="detail-full-width" style={{ marginTop: '20px' }}>
-          <div className="detail-field" style={{ marginBottom: '15px' }}>
-            <label>DESCRIPCIÓN DE LA CARGA</label>
-            <span>{envio.descripcionCarga || '-'}</span>
-          </div>
           <div className="detail-field">
             <label>DIRECCIÓN DE ENTREGA</label>
             <span>{envio.direccionEntrega || '-'}</span>
           </div>
         </div>
 
-        <div className="detail-bottom-grid" style={{ marginTop: '20px', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', paddingBottom: '20px' }}>
-          <div className="detail-field"><label>ORIGEN</label><span>{envio.origen || '-'}</span></div>
-          <div className="detail-field"><label>DESTINO</label><span>{envio.destino || '-'}</span></div>
-          <div className="detail-field"><label>FECHA ESTIMADA</label><span>{envio.fechaEstimada || '-'}</span></div>
+        <div className="info-row-grid">
+          <div className="detail-field">
+            <label>ORIGEN</label>
+            <span>{envio.origen || '-'}</span>
+          </div>
+          <div className="detail-field">
+            <label>DESTINO</label>
+            <span>{envio.destino || '-'}</span>
+          </div>
+          <div className="detail-field">
+            <label>FECHA ESTIMADA</label>
+            <span>{envio.fechaEstimada || '-'}</span>
+          </div>
         </div>
 
-        <div className="detail-full-width" style={{ marginTop: '0', borderTop: '1px solid #E5E7EB', paddingTop: '20px' }}>
-          <div className="detail-field"><label>OBSERVACIONES</label><span>{envio.observaciones || '-'}</span></div>
+        <div style={{ marginTop: '10px', borderTop: '1px solid #E5E7EB', paddingTop: '20px' }}>
+          <div className="detail-field">
+            <label>OBSERVACIONES</label>
+            <span>{envio.observaciones || '-'}</span>
+          </div>
         </div>
 
-        <div style={{ position: 'absolute', bottom: '20px', left: '25px', display: 'flex', gap: '10px' }}>
+        <div style={{ position: 'absolute', bottom: '20px', left: '25px', display: 'flex', gap: '12px' }}>
           {user?.role === 'SUPERVISOR' && (
-            <button 
-              className="btn btn-primary" 
-              onClick={() => navigate(`/envios/editar/${id}`)}
-              style={{ backgroundColor: '#2563EB', color: 'white', padding: '10px 24px', borderRadius: '8px', border: 'none', fontWeight: '600' }}
-            >
-              Editar
-            </button>
-          )}
-          {user?.role === 'SUPERVISOR' && envio.estado !== 'ENTREGADO' && envio.estado !== 'CANCELADO' &&(
-            <button
-              className="btn btn-primary"
-              onClick={() => setCancelacionAbierta(true)}
-              style={{ backgroundColor: '#DC2626', color: 'white', padding: '10px 24px', borderRadius: '8px', border: 'none', fontWeight: '600'}}
+            <>
+              <button 
+                className="btn btn-primary" 
+                onClick={() => navigate(`/editar/${id}`)}
+                style={{ backgroundColor: '#2563EB', padding: '10px 24px', borderRadius: '8px', border: 'none', fontWeight: '600' }}
               >
-                Cancelar envío
+                Editar
               </button>
+              {envio.estado !== 'ENTREGADO' && envio.estado !== 'CANCELADO' && (
+                <button
+                  className="btn btn-primary"
+                  onClick={() => setCancelacionAbierta(true)}
+                  style={{ backgroundColor: '#DC2626', padding: '10px 24px', borderRadius: '8px', border: 'none', fontWeight: '600' }}
+                >
+                  Cancelar envío
+                </button>
+              )}
+            </>
           )}
         </div>
-
         <div style={{ position: 'absolute', bottom: '20px', right: '25px' }}>
           <button 
             onClick={() => setHistorialAbierto(true)} 
@@ -158,12 +248,13 @@ function DetalleEnvio() {
       </div>
 
       {historialAbierto && <ModalHistorial historial={envio.historial || []} alCerrar={() => setHistorialAbierto(false)} />}
-
-      {cancelacionAbierta && (<ModalCancelacion
-              onConfirmar={handleConfirmarCancelacion}
-              onCerrar={() => setCancelacionAbierta(false)}
-              />
-          )}
+      
+      {cancelacionAbierta && (
+        <ModalCancelacion 
+          onConfirmar={handleConfirmarCancelacion} 
+          onCerrar={() => setCancelacionAbierta(false)} 
+        />
+      )}
 
       {modalAbierto && (
         <div className="modal-overlay">
@@ -187,8 +278,6 @@ function DetalleEnvio() {
           </div>
         </div>
       )}
-
-      
     </div>
   );
 }

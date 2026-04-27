@@ -1,23 +1,48 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { getEnvioById, updateEnvio } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 function EditarEnvio() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [form, setForm] = useState(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    getEnvioById(id).then(setForm).catch(() => setError('Error al cargar datos.'));
+    getEnvioById(id)
+      .then(data => {
+        setForm({
+          id: data.id,
+          remitente: data.remitente || '',
+          destinatario: data.destinatario || '',
+          origen: data.origen || '',
+          destino: data.destino || '',
+          descripcionCarga: data.descripcionCarga || '',
+          direccionEntrega: data.direccionEntrega || '',
+          fechaEstimada: data.fechaEstimada || '',
+          observaciones: data.observaciones || ''
+        });
+      })
+      .catch(() => setError('Error al cargar el envío.'));
   }, [id]);
 
   const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleGuardar = async () => {
+    const camposAValidar = ['remitente', 'destinatario', 'origen', 'destino', 'descripcionCarga', 'direccionEntrega', 'fechaEstimada'];
+    const hayCamposVacios = camposAValidar.some(key => !form[key]?.trim());
+
+    if (hayCamposVacios) {
+      setError('Todos los campos con asterisco (*) son obligatorios.');
+      return;
+    }
+
     try {
-      await updateEnvio(id, form);
-      navigate(`/envio/${id}`);
+      const payload = { ...form, usuarioEditor: user?.nombre || 'Sistema' };
+      await updateEnvio(id, payload);
+      navigate(`/detalle/${id}`, { state: { editSuccess: true } });
     } catch (err) {
       setError(err.message || 'Error al actualizar envío.');
     }
@@ -28,7 +53,7 @@ function EditarEnvio() {
   return (
     <div className="container">
       <div className="page-header">
-        <h1>Editar envío</h1>
+        <h1>Editar Envío: {id}</h1>
       </div>
       <div className="card">
         {error && (
@@ -52,35 +77,35 @@ function EditarEnvio() {
           </div>
           <div className="form-group">
             <label>Remitente *</label>
-            <input name="remitente" value={form.remitente || ''} onChange={handleChange} />
+            <input name="remitente" value={form.remitente} onChange={handleChange} />
           </div>
           <div className="form-group">
             <label>Destinatario *</label>
-            <input name="destinatario" value={form.destinatario || ''} onChange={handleChange} />
-          </div>
-          <div className="form-group form-full">
-            <label>Descripción de la carga</label>
-            <input name="descripcionCarga" value={form.descripcionCarga || ''} onChange={handleChange} />
-          </div>
-          <div className="form-group form-full">
-            <label>Dirección de entrega</label>
-            <input name="direccionEntrega" value={form.direccionEntrega || ''} onChange={handleChange} />
+            <input name="destinatario" value={form.destinatario} onChange={handleChange} />
           </div>
           <div className="form-group">
-            <label>Origen</label>
-            <input name="origen" value={form.origen || ''} onChange={handleChange} />
+            <label>Origen *</label>
+            <input name="origen" value={form.origen} onChange={handleChange} />
           </div>
           <div className="form-group">
-            <label>Destino</label>
-            <input name="destino" value={form.destino || ''} onChange={handleChange} />
-          </div>
-          <div className="form-group">
-            <label>Fecha estimada de entrega</label>
-            <input type="date" name="fechaEstimada" value={form.fechaEstimada || ''} onChange={handleChange} />
+            <label>Destino *</label>
+            <input name="destino" value={form.destino} onChange={handleChange} />
           </div>
           <div className="form-group form-full">
-            <label>Observaciones</label>
-            <textarea name="observaciones" value={form.observaciones || ''} onChange={handleChange} rows="3" />
+            <label>Descripción de la carga *</label>
+            <input name="descripcionCarga" value={form.descripcionCarga} onChange={handleChange} />
+          </div>
+          <div className="form-group form-full">
+            <label>Dirección de entrega *</label>
+            <input name="direccionEntrega" value={form.direccionEntrega} onChange={handleChange} />
+          </div>
+          <div className="form-group">
+            <label>Fecha estimada de entrega *</label>
+            <input type="date" name="fechaEstimada" value={form.fechaEstimada} onChange={handleChange} />
+          </div>
+          <div className="form-group form-full">
+            <label>Observaciones (Opcional)</label>
+            <textarea name="observaciones" value={form.observaciones} onChange={handleChange} rows="3" />
           </div>
         </div>
 
@@ -92,8 +117,8 @@ function EditarEnvio() {
           paddingTop: '20px',
           borderTop: '1px solid #eee'
         }}>
-          <button className="btn btn-secondary" onClick={() => navigate(`/envio/${id}`)}>CANCELAR</button>
-          <button className="btn btn-primary" onClick={handleGuardar} style={{ backgroundColor: '#10B981', border: 'none' }}>GUARDAR</button>
+          <button className="btn btn-secondary" onClick={() => navigate(`/detalle/${id}`)}>CANCELAR</button>
+          <button className="btn btn-primary" onClick={handleGuardar} style={{ backgroundColor: '#10B981', border: 'none' }}>ACTUALIZAR ENVÍO</button>
         </div>
       </div>
     </div>

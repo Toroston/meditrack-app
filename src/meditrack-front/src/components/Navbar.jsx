@@ -21,7 +21,13 @@ function Navbar() {
 
   return (
     <nav className="navbar">
-      <a href="/" style={{ textDecoration: 'none', color: 'inherit' }}><div className="navbar-brand">MediTrack</div></a>
+      <div 
+        className="navbar-brand" 
+        onClick={() => navigate('/')} 
+        style={{ cursor: 'pointer' }}
+      >
+        MediTrack
+      </div>
       
       <div className="navbar-user-section">
         <div style={{ textAlign: 'right' }}>

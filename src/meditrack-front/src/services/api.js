@@ -43,6 +43,39 @@ export async function logout() {
   }).catch(() => { });
 }
 
+export async function forgotPassword(email) {
+  const res = await fetch(`${BASE_URL}/auth/forgot-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Error al solicitar código');
+  return data;
+}
+
+export async function verifyCode(email, codigo) {
+  const res = await fetch(`${BASE_URL}/auth/verify-code`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, codigo })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Error al verificar código');
+  return data;
+}
+
+export async function resetPassword(email, codigo, nuevaPassword) {
+  const res = await fetch(`${BASE_URL}/auth/reset-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, codigo, nuevaPassword })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Error al cambiar contraseña');
+  return data;
+}
+
 export async function getEnvios() {
   const res = await fetch(`${BASE_URL}/api/envios`, {
     headers: { ...getAuthHeaders() },
@@ -109,6 +142,21 @@ export async function updateEstadoEnvio(id, estado, fecha, hora, usuario) {
   }
   return res.json();
 }
+
+export async function cancelarEnvio(id, motivo, firma) {
+  const res = await fetch(`${BASE_URL}/api/envios/${id}/cancelar`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+    body: JSON.stringify({ motivo, firma }),
+  });
+  await handleResponse(res);
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || 'Error al cancelar envío');
+  }
+  return res.json();
+}
+
 export async function getUsuarios() {
   const res = await fetch(`${BASE_URL}/api/usuarios`, {
     headers: { ...getAuthHeaders() },
@@ -176,50 +224,6 @@ export async function toggleEstadoUsuario(id) {
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error || 'Error al cambiar estado del usuario');
-
-export async function cancelarEnvio(id, motivo, firma) {
-  const res = await fetch(`${BASE_URL}/api/envios/${id}/cancelar`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-    body: JSON.stringify({ motivo, firma }),
-  });
-  await handleResponse(res);
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.error || 'Error al cancelar envío');
   }
   return res.json();
-}
-
-export async function forgotPassword(email) {
-  const res = await fetch('http://localhost:8080/auth/forgot-password', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email })
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Error al solicitar código');
-  return data;
-}
-
-export async function verifyCode(email, codigo) {
-  const res = await fetch('http://localhost:8080/auth/verify-code', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, codigo })
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Error al verificar código');
-  return data;
-}
-
-export async function resetPassword(email, codigo, nuevaPassword) {
-  const res = await fetch('http://localhost:8080/auth/reset-password', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, codigo, nuevaPassword })
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Error al cambiar contraseña');
-  return data;
 }
