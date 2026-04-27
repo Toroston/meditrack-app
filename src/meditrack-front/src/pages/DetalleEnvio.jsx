@@ -130,7 +130,7 @@ function DetalleEnvio() {
           {user?.role === 'SUPERVISOR' && (
             <button 
               className="btn btn-primary" 
-              onClick={() => navigate(`/editar/${id}`)}
+              onClick={() => navigate(`/envios/editar/${id}`)}
               style={{ backgroundColor: '#2563EB', color: 'white', padding: '10px 24px', borderRadius: '8px', border: 'none', fontWeight: '600' }}
             >
               Editar

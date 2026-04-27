@@ -109,6 +109,73 @@ export async function updateEstadoEnvio(id, estado, fecha, hora, usuario) {
   }
   return res.json();
 }
+export async function getUsuarios() {
+  const res = await fetch(`${BASE_URL}/api/usuarios`, {
+    headers: { ...getAuthHeaders() },
+  });
+  await handleResponse(res);
+  if (!res.ok) throw new Error('Error al obtener usuarios');
+  return res.json();
+}
+
+export async function getUsuarioById(id) {
+  const res = await fetch(`${BASE_URL}/api/usuarios/${id}`, {
+    headers: { ...getAuthHeaders() },
+  });
+  await handleResponse(res);
+  if (!res.ok) throw new Error('Usuario no encontrado');
+  return res.json();
+}
+
+export async function createUsuario(data) {
+  const res = await fetch(`${BASE_URL}/api/usuarios`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+    body: JSON.stringify(data),
+  });
+  await handleResponse(res);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Error al crear usuario');
+  }
+  return res.json();
+}
+
+export async function updateUsuario(id, data) {
+  const dataLimpia = {
+    nombre: data.nombre,
+    dni: data.dni,
+    email: data.email,
+    telefono: data.telefono,
+    rol: data.rol
+  };
+  
+  if (data.password && data.password.trim() !== '') {
+    dataLimpia.password = data.password;
+  }
+
+  const res = await fetch(`${BASE_URL}/api/usuarios/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+    body: JSON.stringify(dataLimpia),
+  });
+  await handleResponse(res);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Error al actualizar usuario');
+  }
+  return res.json();
+}
+
+export async function toggleEstadoUsuario(id) {
+  const res = await fetch(`${BASE_URL}/api/usuarios/${id}/estado`, {
+    method: 'PATCH',
+    headers: { ...getAuthHeaders() },
+  });
+  await handleResponse(res);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Error al cambiar estado del usuario');
 
 export async function cancelarEnvio(id, motivo, firma) {
   const res = await fetch(`${BASE_URL}/api/envios/${id}/cancelar`, {

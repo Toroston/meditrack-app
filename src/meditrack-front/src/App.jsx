@@ -7,6 +7,10 @@ import Home from './pages/Home';
 import NuevoEnvio from './pages/NuevoEnvio';
 import DetalleEnvio from './pages/DetalleEnvio';
 import EditarEnvio from './pages/EditarEnvio';
+import Usuarios from './pages/Usuarios';
+import NuevoUsuario from './pages/NuevoUsuario';
+import EditarUsuario from './pages/EditarUsuario';
+
 import ForgotPassword from './pages/ForgotPassword';
 
 function App() {
@@ -18,9 +22,13 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route element={<ProtectedLayout />}>
             <Route path="/"            element={<Home />} />
+            <Route path="/envios"            element={<Home />} />
             <Route path="/detalle/:id" element={<DetalleEnvio />} />
-            <Route path="/nuevo"       element={<ProtectedRoute roles={['SUPERVISOR']}><NuevoEnvio /></ProtectedRoute>} />
-            <Route path="/editar/:id"  element={<ProtectedRoute roles={['SUPERVISOR']}><EditarEnvio /></ProtectedRoute>} />
+            <Route path="/envios/nuevo"       element={<ProtectedRoute roles={['SUPERVISOR','ADMINISTRADOR']}><NuevoEnvio /></ProtectedRoute>} />
+            <Route path="/envios/editar/:id"  element={<ProtectedRoute roles={['SUPERVISOR','ADMINISTRADOR']}><EditarEnvio /></ProtectedRoute>} />
+            <Route path="/usuarios" element={<Usuarios />} />
+            <Route path="/usuarios/nuevo" element={<NuevoUsuario />} />
+            <Route path="/usuarios/editar/:id" element={<ProtectedRoute roles={['SUPERVISOR','ADMINISTRADOR']}><EditarUsuario /></ProtectedRoute>} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

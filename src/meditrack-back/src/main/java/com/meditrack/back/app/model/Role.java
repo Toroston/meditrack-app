@@ -1,7 +1,8 @@
 package com.meditrack.back.app.model;
 
 public enum Role {
+    ADMINISTRADOR,
     SUPERVISOR,
-    REPARTIDOR,
-    OPERADOR
+    OPERADOR,
+    REPARTIDOR
 }

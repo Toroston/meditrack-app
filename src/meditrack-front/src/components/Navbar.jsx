@@ -21,7 +21,7 @@ function Navbar() {
 
   return (
     <nav className="navbar">
-      <div className="navbar-brand">MediTrack</div>
+      <a href="/" style={{ textDecoration: 'none', color: 'inherit' }}><div className="navbar-brand">MediTrack</div></a>
       
       <div className="navbar-user-section">
         <div style={{ textAlign: 'right' }}>

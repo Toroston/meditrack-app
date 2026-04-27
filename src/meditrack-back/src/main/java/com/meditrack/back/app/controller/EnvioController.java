@@ -78,10 +78,10 @@ public class EnvioController {
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
         try {
             Sesion sesion = autenticar(authHeader);
-            if (sesion.getRole() != Role.SUPERVISOR) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body(Map.of("error", "Sin permisos para esta acción"));
-            }
+            if (sesion.getRole() == Role.REPARTIDOR) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "Sin permisos para esta acción"));
+        }
             Envio nuevo = envioService.crear(body, sesion.getNombre());
             return ResponseEntity.status(HttpStatus.CREATED).body(nuevo);
         } catch (RuntimeException e) {
@@ -94,7 +94,7 @@ public class EnvioController {
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
         try {
             Sesion sesion = autenticar(authHeader);
-            if (sesion.getRole() != Role.SUPERVISOR) {
+            if (sesion.getRole() == Role.REPARTIDOR) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body(Map.of("error", "Solo supervisores pueden editar datos"));
             }

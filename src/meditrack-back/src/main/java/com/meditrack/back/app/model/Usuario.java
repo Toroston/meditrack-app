@@ -1,37 +1,44 @@
 package com.meditrack.back.app.model;
 
+import java.util.UUID;
+
 public class Usuario {
 
+    private String id;
     private String email;
     private String nombre;
     private String password;
     private Role role;
+    private boolean estadoActivo;
+
+    public Usuario() {
+        this.estadoActivo = true;
+    }
 
     public Usuario(String email, String nombre, String password, Role role) {
+        this.id = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         this.email = email;
         this.nombre = nombre;
         this.password = password;
         this.role = role;
+        this.estadoActivo = true;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setPassword(String password) {
-    this.password = password;
-    }
-
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+    
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+    
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+    
+    public Role getRole() { return role; }
+    public void setRole(Role role) { this.role = role; }
+    
+    public boolean isEstadoActivo() { return estadoActivo; }
+    public void setEstadoActivo(boolean estadoActivo) { this.estadoActivo = estadoActivo; }
 }

@@ -74,7 +74,8 @@ function Login() {
           <strong>Usuarios de prueba:</strong><br />
           supervisor@meditrack.com · 1234<br />
           repartidor@meditrack.com · 1234<br />
-          operador@meditrack.com · 1234
+          operador@meditrack.com · 1234<br />
+          admin@meditrack.com · admin123
         </div>
       </div>
     </div>

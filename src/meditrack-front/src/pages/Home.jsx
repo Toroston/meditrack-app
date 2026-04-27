@@ -77,8 +77,8 @@ function Home() {
       
       <div className="header-with-action">
         <h1 style={{ fontSize: '24px', fontWeight: '800' }}>Gestión de Envíos</h1>
-        {user?.role === 'SUPERVISOR' && (
-          <button className="btn btn-primary" onClick={() => navigate('/nuevo')}>
+        {(user?.role === 'SUPERVISOR' || user?.role === 'ADMINISTRADOR') && (
+          <button className="btn btn-primary" onClick={() => navigate('envios/nuevo')}>
             + NUEVO ENVÍO
           </button>
         )}
