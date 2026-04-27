@@ -60,6 +60,14 @@ function Login() {
           <button className="btn btn-primary btn-full" type="submit" disabled={loading}>
             {loading ? 'INGRESANDO...' : 'INGRESAR'}
           </button>
+          
+          <button
+            type="button"
+            onClick={() => navigate('/forgot-password')}
+            style={{ marginTop: '8px', background: 'none', border: 'none', color: 'var(--text-gray)', fontSize: '13px', cursor: 'pointer', width: '100%' }}
+          >
+            ¿Olvidaste tu contraseña?
+          </button>
         </form>
 
         <div className="login-hint">

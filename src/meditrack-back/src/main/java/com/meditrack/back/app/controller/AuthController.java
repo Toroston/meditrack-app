@@ -34,4 +34,36 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("message", "Sesión cerrada"));
     }
 
+// -- Olvide contra --
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> body) {
+        try {
+            Map<String, String> resultado = authService.solicitarReset(body.get("email"));
+            return ResponseEntity.ok(resultado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/verify-code")
+    public ResponseEntity<?> verifyCode(@RequestBody Map<String, String> body) {
+        try {
+            authService.verificarCodigo(body.get("email"), body.get("codigo"));
+            return ResponseEntity.ok(Map.of("mensaje", "Código válido"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
+        try {
+            authService.resetearPassword(body.get("email"), body.get("codigo"), body.get("nuevaPassword"));
+            return ResponseEntity.ok(Map.of("mensaje", "Contraseña actualizada correctamente"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
 }

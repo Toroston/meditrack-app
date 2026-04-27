@@ -30,4 +30,8 @@ public class Usuario {
         return role;
     }
 
+    public void setPassword(String password) {
+    this.password = password;
+    }
+
 }

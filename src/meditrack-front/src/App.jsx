@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import NuevoEnvio from './pages/NuevoEnvio';
 import DetalleEnvio from './pages/DetalleEnvio';
 import EditarEnvio from './pages/EditarEnvio';
+import ForgotPassword from './pages/ForgotPassword';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route element={<ProtectedLayout />}>
             <Route path="/"            element={<Home />} />
             <Route path="/detalle/:id" element={<DetalleEnvio />} />

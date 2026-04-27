@@ -123,3 +123,36 @@ export async function cancelarEnvio(id, motivo, firma) {
   }
   return res.json();
 }
+
+export async function forgotPassword(email) {
+  const res = await fetch('http://localhost:8080/auth/forgot-password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Error al solicitar código');
+  return data;
+}
+
+export async function verifyCode(email, codigo) {
+  const res = await fetch('http://localhost:8080/auth/verify-code', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, codigo })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Error al verificar código');
+  return data;
+}
+
+export async function resetPassword(email, codigo, nuevaPassword) {
+  const res = await fetch('http://localhost:8080/auth/reset-password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, codigo, nuevaPassword })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Error al cambiar contraseña');
+  return data;
+}
