@@ -224,6 +224,4 @@ export async function toggleEstadoUsuario(id) {
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error || 'Error al cambiar estado del usuario');
-  }
-  return res.json();
-}
+  }}

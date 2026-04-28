@@ -70,7 +70,8 @@ public class UsuarioController {
     public ResponseEntity<?> actualizar(@PathVariable String id, @RequestBody Map<String, String> body, @RequestHeader(value = "Authorization", required = false) String authHeader) {
         try {
             Sesion sesion = autenticar(authHeader);
-            Usuario actualizado = usuarioService.actualizar(id, body, sesion.getRole());
+            String usuario = sesion.getNombre();
+            Usuario actualizado = usuarioService.actualizar(id, body, sesion.getRole(), usuario);
             return ResponseEntity.ok(actualizado);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
@@ -81,7 +82,8 @@ public class UsuarioController {
     public ResponseEntity<?> toggleEstado(@PathVariable String id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
         try {
             Sesion sesion = autenticar(authHeader);
-            Usuario actualizado = usuarioService.toggleEstado(id, sesion.getRole());
+            String usuario = sesion.getNombre();
+            Usuario actualizado = usuarioService.toggleEstado(id, sesion.getRole(), usuario);
             return ResponseEntity.ok(actualizado);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));

@@ -5,11 +5,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
 
 import com.meditrack.back.app.model.Role;
 import com.meditrack.back.app.model.Usuario;
+import com.meditrack.back.app.model.HistorialUsuario;
 
 @Service
 public class UsuarioService {
@@ -62,7 +64,7 @@ public class UsuarioService {
         return nuevo;
     }
 
-    public Usuario actualizar(String id, Map<String, String> datos, Role rolEditor) {
+    public Usuario actualizar(String id, Map<String, String> datos, Role rolEditor, String usuarioDelCambio) {
         Usuario usuario = usuarios.stream()
                 .filter(u -> u.getId().equals(id))
                 .findFirst()
@@ -74,17 +76,32 @@ public class UsuarioService {
             throw new RuntimeException("No tienes jerarquía suficiente para modificar o asignar este rol.");
         }
 
-        if (datos.containsKey("nombre")) usuario.setNombre(datos.get("nombre"));
-        if (datos.containsKey("email")) usuario.setEmail(datos.get("email"));
-        if (datos.containsKey("role")) usuario.setRole(rolObjetivo);
-        if (datos.containsKey("password") && !datos.get("password").trim().isEmpty()) {
+        String fechaModificacion = LocalDateTime.now().toString();
+
+        if (datos.containsKey("nombre") && !usuario.getNombre().equals(datos.get("nombre"))){
+            usuario.addHistorial(new HistorialUsuario("Nombre", usuario.getNombre(), datos.get("nombre"), fechaModificacion, usuarioDelCambio));
+            usuario.setNombre(datos.get("nombre"));
+        }
+         
+        if (datos.containsKey("email") && !usuario.getEmail().equals(datos.get("email"))){
+            usuario.addHistorial(new HistorialUsuario("Email", usuario.getEmail(), datos.get("email"), fechaModificacion, usuarioDelCambio));
+            usuario.setEmail(datos.get("email"));
+        } 
+
+        if (datos.containsKey("role") && usuario.getRole() != rolObjetivo){
+            usuario.addHistorial(new HistorialUsuario("Role", usuario.getRole().toString(), rolObjetivo.toString(), fechaModificacion, usuarioDelCambio));
+            usuario.setRole(rolObjetivo);
+        } 
+
+        if (datos.containsKey("password") && !datos.get("password").trim().isEmpty() && usuario.getPassword().equals(datos.get("password"))) {
+            usuario.addHistorial(new HistorialUsuario("Password", usuario.getPassword(), datos.get("password"), fechaModificacion, usuarioDelCambio));
             usuario.setPassword(datos.get("password")); 
         }
 
         return usuario;
     }
 
-    public Usuario toggleEstado(String id, Role rolEditor) {
+    public Usuario toggleEstado(String id, Role rolEditor, String usuarioDelCambio) {
         Usuario usuario = usuarios.stream()
                 .filter(u -> u.getId().equals(id))
                 .findFirst()
@@ -94,9 +111,15 @@ public class UsuarioService {
             throw new RuntimeException("No tienes permiso para desactivar a este usuario.");
         }
 
+        String estadoAnterior = usuario.isEstadoActivo() ? "Activo" : "Inactivo";
         usuario.setEstadoActivo(!usuario.isEstadoActivo());
+
+        String estadoActual = usuario.isEstadoActivo() ? "Activo" : "Inactivo";
+        usuario.addHistorial(new HistorialUsuario("Estado", estadoAnterior, estadoActual, LocalDateTime.now().toString(), usuarioDelCambio));
+
         return usuario;
     }
+
     public Optional<Usuario> buscarPorEmail(String email) {
         return usuarios.stream()
                 .filter(u -> u.getEmail().equals(email))
