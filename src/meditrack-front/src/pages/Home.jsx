@@ -74,7 +74,8 @@ useEffect(() => {
   const filtradosYOrdenados = getSortedData(
     envios.filter(e => {
       const term = busqueda.toLowerCase();
-      const matchBusqueda = e.id.toLowerCase().includes(term) || 
+      const matchBusqueda = e.id.toLowerCase().includes(term) ||
+                            e.remitente?.toLowerCase().includes(term) ||
                             e.destinatario?.toLowerCase().includes(term);
       const matchEstado = filtroEstado ? e.estado === filtroEstado : true;
       return matchBusqueda && matchEstado;
@@ -155,7 +156,7 @@ useEffect(() => {
       <div className="header-with-action">
         <h1 style={{ fontSize: '24px', fontWeight: '800' }}>Gestión de Envíos</h1>
         {(user?.role === 'SUPERVISOR' || user?.role === 'ADMINISTRADOR') && (
-          <button className="btn btn-primary" onClick={() => navigate('/nuevo')}>
+          <button className="btn btn-primary" onClick={() => navigate('/envios/nuevo')}>
             + NUEVO ENVÍO
           </button>
         )}
@@ -187,7 +188,7 @@ useEffect(() => {
       <div className="card">
         <input 
           style={{ marginBottom: '20px', width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }}
-          placeholder="🔍 Buscar por Tracking ID o Destinatario..." 
+          placeholder="Buscar por Tracking ID, Remitente o Destinatario..."
           value={busqueda} 
           onChange={e => setBusqueda(e.target.value)} 
         />

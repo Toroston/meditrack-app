@@ -89,4 +89,5 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));
         }
     }
+
 }

@@ -16,7 +16,48 @@ import com.meditrack.back.app.model.HistorialEstado;
 
 @Service
 public class EnvioService {
+
     private List<Envio> envios = new ArrayList<>();
+
+    private void registrarHistorial(Envio e, String tipo, EstadoEnvio estado, String detalle, String f, String h, String u) {
+        HistorialEstado evento = new HistorialEstado();
+        evento.setTipo(tipo);
+        evento.setEstado(estado);
+        evento.setDetalle(detalle);
+        evento.setFecha(f);
+        evento.setHora(h);
+        evento.setUsuario(u);
+        e.agregarHistorial(evento);
+    }
+
+    private String obtenerValorCampo(Envio e, String campo) {
+        switch (campo) {
+            case "remitente": return e.getRemitente();
+            case "destinatario": return e.getDestinatario();
+            case "descripcionCarga": return e.getDescripcionCarga();
+            case "direccionEntrega": return e.getDireccionEntrega();
+            case "origen": return e.getOrigen();
+            case "destino": return e.getDestino();
+            case "fechaEstimada": return e.getFechaEstimada();
+            case "prioridad": return e.getPrioridad();
+            case "observaciones": return e.getObservaciones();
+            default: return "";
+        }
+    }
+
+    private void asignarValorCampo(Envio e, String campo, String valor) {
+        switch (campo) {
+            case "remitente": e.setRemitente(valor); break;
+            case "destinatario": e.setDestinatario(valor); break;
+            case "descripcionCarga": e.setDescripcionCarga(valor); break;
+            case "direccionEntrega": e.setDireccionEntrega(valor); break;
+            case "origen": e.setOrigen(valor); break;
+            case "destino": e.setDestino(valor); break;
+            case "fechaEstimada": e.setFechaEstimada(valor); break;
+            case "prioridad": e.setPrioridad(valor); break;
+            case "observaciones": e.setObservaciones(valor); break;
+        }
+    }
 
     public List<Envio> listarTodos() {
         return envios;
@@ -114,47 +155,8 @@ public class EnvioService {
         return envio;
     }
 
-    private void registrarHistorial(Envio e, String tipo, EstadoEnvio estado, String detalle, String f, String h, String u) {
-        HistorialEstado evento = new HistorialEstado();
-        evento.setTipo(tipo);
-        evento.setEstado(estado);
-        evento.setDetalle(detalle);
-        evento.setFecha(f);
-        evento.setHora(h);
-        evento.setUsuario(u);
-        e.agregarHistorial(evento);
-    }
-
-    private String obtenerValorCampo(Envio e, String campo) {
-        switch (campo) {
-            case "remitente": return e.getRemitente();
-            case "destinatario": return e.getDestinatario();
-            case "descripcionCarga": return e.getDescripcionCarga();
-            case "direccionEntrega": return e.getDireccionEntrega();
-            case "origen": return e.getOrigen();
-            case "destino": return e.getDestino();
-            case "fechaEstimada": return e.getFechaEstimada();
-            case "prioridad": return e.getPrioridad();
-            case "observaciones": return e.getObservaciones();
-            default: return "";
-        }
-    }
-
-    private void asignarValorCampo(Envio e, String campo, String valor) {
-        switch (campo) {
-            case "remitente": e.setRemitente(valor); break;
-            case "destinatario": e.setDestinatario(valor); break;
-            case "descripcionCarga": e.setDescripcionCarga(valor); break;
-            case "direccionEntrega": e.setDireccionEntrega(valor); break;
-            case "origen": e.setOrigen(valor); break;
-            case "destino": e.setDestino(valor); break;
-            case "fechaEstimada": e.setFechaEstimada(valor); break;
-            case "prioridad": e.setPrioridad(valor); break;
-            case "observaciones": e.setObservaciones(valor); break;
-        }
-    }
-
     public boolean eliminar(String id) {
         return envios.removeIf(e -> e.getId().equals(id));
     }
+
 }

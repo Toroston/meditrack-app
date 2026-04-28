@@ -10,8 +10,7 @@ public enum EstadoEnvio {
     INCIDENTE_REPORTADO,
     CANCELADO;
 
-    public EstadoEnvio siguiente() {
-        
+    public EstadoEnvio siguiente() {   
         if (this == CANCELADO){
             throw new IllegalStateException("El envío está cancelado");
         }

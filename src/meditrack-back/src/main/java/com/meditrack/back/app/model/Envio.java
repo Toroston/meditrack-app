@@ -32,8 +32,8 @@ public class Envio {
         this.horaCreacion = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
     }
 
-    public Envio(String id, String remitente, String destinatario, String direccionEntrega, String origen,
-                 String destino, String fechaEstimada, String descripcionCarga, String observaciones, EstadoEnvio estado, String usuario) {
+    public Envio(String id, String remitente, String destinatario, String direccionEntrega, String origen, String destino,
+        String fechaEstimada, String descripcionCarga, String observaciones, EstadoEnvio estado, String usuario) {
         this.id = id;
         this.remitente = remitente;
         this.destinatario = destinatario;
@@ -49,41 +49,152 @@ public class Envio {
         this.horaCreacion = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
-    public String getRemitente() { return remitente; }
-    public void setRemitente(String v) { this.remitente = v; }
-    public String getDestinatario() { return destinatario; }
-    public void setDestinatario(String v) { this.destinatario = v; }
-    public String getDireccionEntrega() { return direccionEntrega; }
-    public void setDireccionEntrega(String v) { this.direccionEntrega = v; }
-    public String getOrigen() { return origen; }
-    public void setOrigen(String v) { this.origen = v; }
-    public String getDestino() { return destino; }
-    public void setDestino(String v) { this.destino = v; }
-    public String getFechaEstimada() { return fechaEstimada; }
-    public void setFechaEstimada(String v) { this.fechaEstimada = v; }
-    public String getDescripcionCarga() { return descripcionCarga; }
-    public void setDescripcionCarga(String v) { this.descripcionCarga = v; }
-    public String getObservaciones() { return observaciones; }
-    public void setObservaciones(String v) { this.observaciones = v; }
-    public EstadoEnvio getEstado() { return estado; }
-    public void setEstado(EstadoEnvio v) { this.estado = v; }
-    public List<HistorialEstado> getHistorial() { return historial; }
-    public void setHistorial(List<HistorialEstado> historial) { this.historial = historial; }
-    public void agregarHistorial(HistorialEstado entrada) { this.historial.add(entrada); }
-    public String getPrioridad() { return prioridad; }
-    public void setPrioridad(String prioridad) { this.prioridad = prioridad; }
-    public String getUsuarioResponsable() { return usuarioResponsable; }
-    public void setUsuarioResponsable(String usuarioResponsable) { this.usuarioResponsable = usuarioResponsable; }
-    public String getFechaCreacion() { return fechaCreacion; }
-    public void setFechaCreacion(String fechaCreacion) { this.fechaCreacion = fechaCreacion; }
-    public String getHoraCreacion() { return horaCreacion; }
-    public void setHoraCreacion(String horaCreacion) { this.horaCreacion = horaCreacion; }
-    public String getMotivoCancelacion() { return motivoCancelacion; }
-    public void setMotivoCancelacion(String motivoCancelacion) { this.motivoCancelacion = motivoCancelacion; }
-    public String getFirmaCancelacion(){ return firmaCancelacion; }
-    public void setFirmaCancelacion(String firmaCancelacion){ this.firmaCancelacion = firmaCancelacion; }
-    public String getFechaCancelacion(){ return fechaCancelacion; }
-    public void setFechaCancelacion(String fechaCancelacion){ this.fechaCancelacion = fechaCancelacion; }
+    public String getId() { 
+        return id; 
+    }
+
+    public void setId(String id) { 
+        this.id = id; 
+    }
+
+    public String getRemitente() { 
+        return remitente; 
+    }
+
+    public void setRemitente(String v) { 
+        this.remitente = v; 
+    }
+
+    public String getDestinatario() { 
+        return destinatario; 
+    }
+
+    public void setDestinatario(String v) { 
+        this.destinatario = v; 
+    }
+
+    public String getDireccionEntrega() { 
+        return direccionEntrega; 
+    }
+
+    public void setDireccionEntrega(String v) { 
+        this.direccionEntrega = v; 
+    }
+
+    public String getOrigen() { 
+        return origen; 
+    }
+
+    public void setOrigen(String v) { 
+        this.origen = v; 
+    }
+
+    public String getDestino() { 
+        return destino; 
+    }
+
+    public void setDestino(String v) { 
+        this.destino = v; 
+    }
+
+    public String getFechaEstimada() { 
+        return fechaEstimada; 
+    }
+
+    public void setFechaEstimada(String v) { 
+        this.fechaEstimada = v; 
+    }
+
+    public String getDescripcionCarga() { 
+        return descripcionCarga; 
+    }
+
+    public void setDescripcionCarga(String v) { 
+        this.descripcionCarga = v; 
+    }
+
+    public String getObservaciones() { 
+        return observaciones; 
+    }
+
+    public void setObservaciones(String v) { 
+        this.observaciones = v; 
+    }
+
+    public EstadoEnvio getEstado() { 
+        return estado; 
+    }
+
+    public void setEstado(EstadoEnvio v) { 
+        this.estado = v; 
+    }
+
+    public List<HistorialEstado> getHistorial() { 
+        return historial; 
+    }
+
+    public void setHistorial(List<HistorialEstado> historial) { 
+        this.historial = historial; 
+    }
+
+    public void agregarHistorial(HistorialEstado entrada) { 
+        this.historial.add(entrada); 
+    }
+
+    public String getPrioridad() { 
+        return prioridad; 
+    }
+
+    public void setPrioridad(String prioridad) { 
+        this.prioridad = prioridad; 
+    }
+
+    public String getUsuarioResponsable() { 
+        return usuarioResponsable; 
+    }
+
+    public void setUsuarioResponsable(String usuarioResponsable) { 
+        this.usuarioResponsable = usuarioResponsable; 
+    }
+
+    public String getFechaCreacion() { 
+        return fechaCreacion; 
+    }
+
+    public void setFechaCreacion(String fechaCreacion) { 
+        this.fechaCreacion = fechaCreacion; 
+    }
+
+    public String getHoraCreacion() { 
+        return horaCreacion; 
+    }
+
+    public void setHoraCreacion(String horaCreacion) { 
+        this.horaCreacion = horaCreacion; 
+    }
+
+    public String getMotivoCancelacion() { 
+        return motivoCancelacion; 
+    }
+
+    public void setMotivoCancelacion(String motivoCancelacion) { 
+        this.motivoCancelacion = motivoCancelacion; 
+    }
+
+    public String getFirmaCancelacion() { 
+        return firmaCancelacion; 
+    }
+
+    public void setFirmaCancelacion(String firmaCancelacion) { 
+        this.firmaCancelacion = firmaCancelacion; 
+    }
+
+    public String getFechaCancelacion() { 
+        return fechaCancelacion; 
+    }
+
+    public void setFechaCancelacion(String fechaCancelacion) { 
+        this.fechaCancelacion = fechaCancelacion; 
+    }
+    
 }

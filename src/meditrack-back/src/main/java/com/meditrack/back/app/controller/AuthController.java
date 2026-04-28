@@ -34,8 +34,6 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("message", "Sesión cerrada"));
     }
 
-// -- Olvide contra --
-
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> body) {
         try {
