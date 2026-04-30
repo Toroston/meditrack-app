@@ -12,12 +12,19 @@ const ESTADO_COLORS = {
   EN_PREPARACION: '#f59e0b',
   EN_TRANSITO: '#3b82f6',
   EN_PUNTO_DE_ENTREGA: '#06b6d4',
-  INCIDENTE_REPORTADO: '#ef4444',
+  INCIDENTE_REPORTADO: '#f59e0b',
   ENTREGADO: '#10b981',
-  CANCELADO: '#000000'
+  CANCELADO: '#ec0c0c'
 };
 
-const ORDEN_ESTADOS = Object.keys(ESTADO_COLORS);
+const FLUJO_ESTANDAR = [
+  'PENDIENTE',
+  'ASIGNADO',
+  'EN_PREPARACION',
+  'EN_TRANSITO',
+  'EN_PUNTO_DE_ENTREGA',
+  'ENTREGADO'
+];
 
 function ahora() {
   const d = new Date();
@@ -42,7 +49,7 @@ function DetalleEnvio() {
   const [modalError, setModalError] = useState('');
   const [cancelacionAbierta, setCancelacionAbierta] = useState(false);
 
-useEffect(() => {
+  useEffect(() => {
     getEnvioById(id)
       .then(data => {
         setEnvio(data);
@@ -55,34 +62,51 @@ useEffect(() => {
         });
       })
       .catch(() => setError('Envío no encontrado.'));
+
     if (location.state?.editSuccess) {
-      const showTimer = setTimeout(() => {
-        setShowSnackbar(true);
-      }, 100);
-
+      const showTimer = setTimeout(() => setShowSnackbar(true), 100);
       window.history.replaceState({}, document.title);
-
-      const hideTimer = setTimeout(() => {
-        setShowSnackbar(false);
-      }, 3100);
-
-      return () => {
-        clearTimeout(showTimer);
-        clearTimeout(hideTimer);
-      };
+      const hideTimer = setTimeout(() => setShowSnackbar(false), 3100);
+      return () => { clearTimeout(showTimer); clearTimeout(hideTimer); };
     }
   }, [id, user?.nombre, location.state]);
 
   const abrirModalEstado = () => {
     const { fecha, hora } = ahora();
-    setModalForm(prev => ({ ...prev, fecha, hora, usuario: user?.nombre || '' }));
+    const opcionesValidas = getOpcionesDisponibles();
+    
+    setModalForm(prev => ({ 
+      ...prev, 
+      nuevoEstado: opcionesValidas.length > 0 ? opcionesValidas[0] : envio.estado, 
+      fecha, 
+      hora, 
+      usuario: user?.nombre || '' 
+    }));
     setModalError('');
     setModalAbierto(true);
   };
 
+  const getOpcionesDisponibles = () => {
+    if (!envio) return [];
+    const estadoActual = envio.estado;
+    const opciones = [];
+
+    const indexActual = FLUJO_ESTANDAR.indexOf(estadoActual);
+    if (indexActual !== -1 && indexActual < FLUJO_ESTANDAR.length - 1) {
+      opciones.push(FLUJO_ESTANDAR[indexActual + 1]);
+    }
+
+    if (estadoActual === 'EN_TRANSITO' || estadoActual === 'EN_PUNTO_DE_ENTREGA') {
+      opciones.push('INCIDENTE_REPORTADO');
+    }
+
+    return opciones;
+  };
+
   const handleConfirmarEstado = async () => {
+    const { nuevoEstado } = modalForm;
     try {
-      const actualizado = await updateEstadoEnvio(id, modalForm.nuevoEstado, modalForm.fecha, modalForm.hora, modalForm.usuario);
+      const actualizado = await updateEstadoEnvio(id, nuevoEstado, modalForm.fecha, modalForm.hora, modalForm.usuario);
       setEnvio(actualizado);
       setModalAbierto(false);
     } catch (e) {
@@ -154,10 +178,9 @@ useEffect(() => {
         <h1 style={{ fontSize: '24px', fontWeight: '800', color: '#111827' }}>Detalle del envío</h1>
       </div>
 
-      <StatusLine estadoActual={envio.estado} />
+      <StatusLine estadoActual={envio.estado} historial={envio.historial || []} />
 
       <div className="card detail-main-card" style={{ position: 'relative', paddingBottom: '80px', paddingTop: '30px' }}>
-        
         <div className="info-row-grid">
           <div className="detail-field">
             <label>TRACKING ID</label>
@@ -167,9 +190,9 @@ useEffect(() => {
             <label>ESTADO</label>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <span style={getBadgeStyle(envio.estado)}>{envio.estado?.replace(/_/g, ' ')}</span>
-              <button className="btn btn-primary btn-sm" onClick={abrirModalEstado} style={{ backgroundColor: '#10B981', border: 'none' }}>
-                ▾
-              </button>
+              {envio.estado !== 'ENTREGADO' && envio.estado !== 'CANCELADO' && (
+                <button className="btn btn-primary btn-sm" onClick={abrirModalEstado} style={{ backgroundColor: '#10B981', border: 'none' }}>▾</button>
+              )}
             </div>
           </div>
           <div className="detail-field">
@@ -225,7 +248,7 @@ useEffect(() => {
               >
                 Editar
               </button>
-              {envio.estado !== 'ENTREGADO' && envio.estado !== 'CANCELADO' && (
+              {(envio.estado === 'INCIDENTE_REPORTADO' || envio.estado === 'PENDIENTE') && (
                 <button
                   className="btn btn-primary"
                   onClick={() => setCancelacionAbierta(true)}
@@ -259,20 +282,38 @@ useEffect(() => {
       {modalAbierto && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h2>Actualizar estado del envío</h2>
-            <div className="form-group"><label>Estado actual</label><input value={envio.estado?.replace(/_/g, ' ')} disabled className="input-locked" /></div>
+            <h2 style={{ marginBottom: '20px' }}>Actualizar estado del envío</h2>
+            <div className="form-group">
+              <label>Estado actual</label>
+              <input value={envio.estado?.replace(/_/g, ' ')} disabled className="input-locked" />
+            </div>
             <div className="form-group">
               <label>Nuevo estado</label>
-              <select value={modalForm.nuevoEstado} onChange={e => setModalForm({...modalForm, nuevoEstado: e.target.value})}>
-                {ORDEN_ESTADOS.map(st => <option key={st} value={st}>{st.replace(/_/g, ' ')}</option>)}
+              <select 
+                value={modalForm.nuevoEstado} 
+                onChange={e => setModalForm({...modalForm, nuevoEstado: e.target.value})}
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #E5E7EB' }}
+              >
+                {getOpcionesDisponibles().map(st => (
+                  <option key={st} value={st}>{st.replace(/_/g, ' ')}</option>
+                ))}
+                {getOpcionesDisponibles().length === 0 && (
+                  <option disabled>No hay estados siguientes disponibles</option>
+                )}
               </select>
             </div>
             <div className="form-group"><label>Fecha</label><input type="date" value={modalForm.fecha} onChange={e => setModalForm({...modalForm, fecha: e.target.value})} /></div>
             <div className="form-group"><label>Hora</label><input type="time" value={modalForm.hora} onChange={e => setModalForm({...modalForm, hora: e.target.value})} /></div>
             <div className="form-group"><label>Usuario</label><input value={modalForm.usuario} disabled className="input-locked" /></div>
             {modalError && <p className="error-msg">{modalError}</p>}
-            <div className="modal-actions">
-              <button className="btn btn-primary" onClick={handleConfirmarEstado}>CONFIRMAR</button>
+            <div className="modal-actions" style={{ marginTop: '20px' }}>
+              <button 
+                className="btn btn-primary" 
+                onClick={handleConfirmarEstado} 
+                disabled={getOpcionesDisponibles().length === 0}
+              >
+                CONFIRMAR
+              </button>
               <button className="btn btn-secondary" onClick={() => setModalAbierto(false)}>CANCELAR</button>
             </div>
           </div>

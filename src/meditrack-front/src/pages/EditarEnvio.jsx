@@ -8,12 +8,13 @@ function EditarEnvio() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [form, setForm] = useState(null);
+  const [datosOriginales, setDatosOriginales] = useState(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
     getEnvioById(id)
       .then(data => {
-        setForm({
+        const initialForm = {
           id: data.id,
           remitente: data.remitente || '',
           destinatario: data.destinatario || '',
@@ -23,7 +24,9 @@ function EditarEnvio() {
           direccionEntrega: data.direccionEntrega || '',
           fechaEstimada: data.fechaEstimada || '',
           observaciones: data.observaciones || ''
-        });
+        };
+        setForm(initialForm);
+        setDatosOriginales(initialForm);
       })
       .catch(() => setError('Error al cargar el envío.'));
   }, [id]);
@@ -39,6 +42,12 @@ function EditarEnvio() {
       return;
     }
 
+    const haCambiado = JSON.stringify(form) !== JSON.stringify(datosOriginales);
+
+    if (!haCambiado) {
+      navigate(`/detalle/${id}`);
+      return;
+    }
     try {
       const payload = { ...form, usuarioEditor: user?.nombre || 'Sistema' };
       await updateEnvio(id, payload);
