@@ -105,6 +105,7 @@ const StatusLine = ({ estadoActual, historial = [] }) => {
                 justifyContent: 'center',
                 alignItems: 'center',
                 fontWeight: 'bold',
+                fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
                 marginBottom: isMobile ? '0' : '12px',
                 marginRight: isMobile ? '15px' : '0',
                 transition: 'all 0.3s',
@@ -114,13 +115,14 @@ const StatusLine = ({ estadoActual, historial = [] }) => {
               }}>
                 {config.icon}
               </div>
-              <span style={{ 
-                fontSize: '10px', 
+              <span style={{
+                fontSize: '10px',
                 textAlign: isMobile ? 'left' : 'center',
                 fontWeight: index === indiceActual ? '800' : '500',
                 color: isPassed ? config.color : '#9CA3AF',
                 textTransform: 'uppercase',
-                maxWidth: isMobile ? 'none' : '90px'
+                maxWidth: isMobile ? 'none' : '90px',
+                fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif"
               }}>
                 {step.replace(/_/g, ' ')}
               </span>

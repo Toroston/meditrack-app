@@ -76,7 +76,7 @@ function EditarUsuario() {
                     </div>
 
                     <div className="form-group">
-                        <label>Nombre Completo *</label>
+                        <label>Nombre completo *</label>
                         <input name="nombre" value={form.nombre || ''} onChange={handleChange} />
                     </div>
 
@@ -115,13 +115,13 @@ function EditarUsuario() {
                 <div style={{
                     display: 'flex',
                     justifyContent: 'flex-end',
-                    gap: '12px',
+                    gap: '6px',
                     marginTop: '25px',
                     paddingTop: '20px',
                     borderTop: '1px solid #eee'
                 }}>
                     <button className="btn btn-secondary" onClick={() => navigate('/usuarios')}>CANCELAR</button>
-                    <button className="btn btn-primary" onClick={handleGuardar} style={{ backgroundColor: '#10B981', border: 'none' }}>GUARDAR</button>
+                    <button className="btn btn-primary" onClick={handleGuardar}>GUARDAR</button>
                 </div>
             </div>
         </div>

@@ -34,4 +34,5 @@ public class HistorialUsuario {
     public String getAutor() {
         return autor;
     }
+    
 }

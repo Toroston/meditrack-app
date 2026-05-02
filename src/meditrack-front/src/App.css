@@ -129,8 +129,13 @@ th {
   text-transform: uppercase;
 }
 
-th:first-child { border-radius: 8px 0 0 0; }
-th:last-child { border-radius: 0 8px 0 0; }
+th:first-child {
+  border-radius: 8px 0 0 0;
+}
+
+th:last-child {
+  border-radius: 0 8px 0 0;
+}
 
 td {
   padding: 15px 12px;
@@ -161,7 +166,22 @@ tr:nth-child(even) {
   text-transform: uppercase;
 }
 
-.badge-CREADO { background: #e5e7eb; color: #374151; }
-.badge-EN_TRANSITO { background: #dbeafe; color: var(--secondary-blue); }
-.badge-ENTREGADO { background: #dcfce7; color: var(--success); }
-.badge-INCIDENCIA { background: #fef3c7; color: var(--warning); }
+.badge-CREADO {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.badge-EN_TRANSITO {
+  background: #dbeafe;
+  color: var(--secondary-blue);
+}
+
+.badge-ENTREGADO {
+  background: #dcfce7;
+  color: var(--success);
+}
+
+.badge-INCIDENCIA {
+  background: #fef3c7;
+  color: var(--warning);
+}

@@ -121,13 +121,13 @@ function EditarEnvio() {
         <div style={{ 
           display: 'flex', 
           justifyContent: 'flex-end', 
-          gap: '12px', 
+          gap: '6px',
           marginTop: '25px',
           paddingTop: '20px',
           borderTop: '1px solid #eee'
         }}>
           <button className="btn btn-secondary" onClick={() => navigate(`/detalle/${id}`)}>CANCELAR</button>
-          <button className="btn btn-primary" onClick={handleGuardar} style={{ backgroundColor: '#10B981', border: 'none' }}>ACTUALIZAR ENVÍO</button>
+          <button className="btn btn-primary" onClick={handleGuardar}>ACTUALIZAR ENVÍO</button>
         </div>
       </div>
     </div>

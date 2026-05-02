@@ -157,7 +157,7 @@ function Home() {
               </Pie>
             </PieChart>
           </ResponsiveContainer>
-          <div className="chart-center-label" style={{ textAlign: 'center' }}>
+          <div className="chart-center-label" style={{ textAlign: 'center', fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif" }}>
             <div style={{ fontSize: '10px', color: '#6B7280', fontWeight: '700' }}>TOTAL</div>
             <div style={{ fontSize: '28px', color: '#111827', fontWeight: '900' }}>{envios.length}</div>
           </div>
@@ -177,16 +177,16 @@ function Home() {
                 onClick={(e) => { e.stopPropagation(); toggleFiltro(key); }}
               >
                 <div className="detail-info-block">
-                  <span className="detail-label" style={{ color: color }}>{key.replace(/_/g, ' ')}</span>
-                  <span className="detail-count">{count}</span>
+                  <span className="detail-label" style={{ color, fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif" }}>{key.replace(/_/g, ' ')}</span>
+                  <span className="detail-count" style={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif" }}>{count}</span>
                 </div>
                 <div className="mini-chart-wrapper">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
                         data={getChartData(key, color)}
-                        innerRadius={22}
-                        outerRadius={28}
+                        innerRadius={26}
+                        outerRadius={34}
                         stroke="none"
                         dataKey="value"
                         startAngle={90}
@@ -199,7 +199,7 @@ function Home() {
                       </Pie>
                     </PieChart>
                   </ResponsiveContainer>
-                  <span className="mini-percent">
+                  <span className="mini-percent" style={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif" }}>
                     {percent}<span className="mini-percent-symbol">%</span>
                   </span>
                 </div>

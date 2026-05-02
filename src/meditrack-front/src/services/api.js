@@ -215,6 +215,36 @@ export async function updateUsuario(id, data) {
   return res.json();
 }
 
+// --- Medicamentos (stubs — conectar cuando exista el modelo) ---
+
+const MOCK_MEDICAMENTOS = [
+  { id: 1, nombre: 'Ibuprofeno 400mg', principioActivo: 'Ibuprofeno', laboratorio: 'Bayer', presentacion: 'Comprimidos', stock: 500, unidad: 'mg' },
+  { id: 2, nombre: 'Amoxicilina 500mg', principioActivo: 'Amoxicilina', laboratorio: 'Pfizer', presentacion: 'Cápsulas', stock: 200, unidad: 'mg' },
+  { id: 3, nombre: 'Paracetamol 1g', principioActivo: 'Paracetamol', laboratorio: 'Genoma', presentacion: 'Comprimidos', stock: 800, unidad: 'mg' },
+];
+
+export async function getMedicamentos() {
+  return structuredClone(MOCK_MEDICAMENTOS);
+}
+
+export async function getMedicamentoById(id) {
+  const m = MOCK_MEDICAMENTOS.find(m => String(m.id) === String(id));
+  if (!m) throw new Error('Medicamento no encontrado');
+  return structuredClone(m);
+}
+
+export async function updateMedicamento(id, data) {
+  const idx = MOCK_MEDICAMENTOS.findIndex(m => String(m.id) === String(id));
+  if (idx === -1) throw new Error('Medicamento no encontrado');
+  MOCK_MEDICAMENTOS[idx] = { ...MOCK_MEDICAMENTOS[idx], ...data };
+  return structuredClone(MOCK_MEDICAMENTOS[idx]);
+}
+
+export async function deleteMedicamento(id) {
+  const idx = MOCK_MEDICAMENTOS.findIndex(m => String(m.id) === String(id));
+  if (idx !== -1) MOCK_MEDICAMENTOS.splice(idx, 1);
+}
+
 export async function toggleEstadoUsuario(id) {
   const res = await fetch(`${BASE_URL}/api/usuarios/${id}/estado`, {
     method: 'PATCH',

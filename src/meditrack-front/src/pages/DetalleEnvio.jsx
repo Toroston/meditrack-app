@@ -133,6 +133,7 @@ function DetalleEnvio() {
       borderRadius: '20px',
       fontSize: '12px',
       fontWeight: '800',
+      fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
       border: `1px solid ${color}40`,
       textTransform: 'uppercase'
     };
@@ -191,7 +192,7 @@ function DetalleEnvio() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <span style={getBadgeStyle(envio.estado)}>{envio.estado?.replace(/_/g, ' ')}</span>
               {envio.estado !== 'ENTREGADO' && envio.estado !== 'CANCELADO' && (
-                <button className="btn btn-primary btn-sm" onClick={abrirModalEstado} style={{ backgroundColor: '#10B981', border: 'none' }}>▾</button>
+                <button className="btn btn-primary btn-sm" onClick={abrirModalEstado}>▾</button>
               )}
             </div>
           </div>
@@ -238,34 +239,29 @@ function DetalleEnvio() {
           </div>
         </div>
 
-        <div style={{ position: 'absolute', bottom: '20px', left: '25px', display: 'flex', gap: '12px' }}>
+        <div style={{ position: 'absolute', bottom: '20px', left: '25px', display: 'flex', gap: '6px' }}>
           {user?.role === 'SUPERVISOR' && (
             <>
-              <button 
-                className="btn btn-primary" 
+              <button
+                className="btn btn-primary"
                 onClick={() => navigate(`/envios/editar/${id}`)}
-                style={{ backgroundColor: '#2563EB', padding: '10px 24px', borderRadius: '8px', border: 'none', fontWeight: '600' }}
               >
-                Editar
+                EDITAR
               </button>
               {(envio.estado === 'INCIDENTE_REPORTADO' || envio.estado === 'PENDIENTE') && (
                 <button
-                  className="btn btn-primary"
+                  className="btn btn-danger"
                   onClick={() => setCancelacionAbierta(true)}
-                  style={{ backgroundColor: '#DC2626', padding: '10px 24px', borderRadius: '8px', border: 'none', fontWeight: '600' }}
                 >
-                  Cancelar envío
+                  CANCELAR ENVÍO
                 </button>
               )}
             </>
           )}
         </div>
         <div style={{ position: 'absolute', bottom: '20px', right: '25px' }}>
-          <button 
-            onClick={() => setHistorialAbierto(true)} 
-            style={{ backgroundColor: 'transparent', color: '#2563EB', border: 'none', cursor: 'pointer', fontWeight: '600', fontSize: '14px', textDecoration: 'underline' }}
-          >
-            Ver historial de cambios
+          <button className="btn btn-secondary" onClick={() => setHistorialAbierto(true)}>
+            VER HISTORIAL
           </button>
         </div>
       </div>

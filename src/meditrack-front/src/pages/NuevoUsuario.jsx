@@ -61,7 +61,7 @@ function NuevoUsuario() {
     return (
         <div className="container">
         <div className="page-header">
-            <h1>{isEditing ? 'Editar Usuario' : 'Nuevo Usuario'}</h1>
+            <h1>{isEditing ? 'Editar usuario' : 'Nuevo usuario'}</h1>
         </div>
 
         <div className="card">
@@ -73,7 +73,7 @@ function NuevoUsuario() {
 
             <div className="form-grid">
             <div className="form-group">
-                <label>Nombre Completo *</label>
+                <label>Nombre completo *</label>
                 <input name="nombre" value={form.nombre} onChange={handleChange} placeholder="Ej. Juan Pérez" />
             </div>
 
@@ -98,9 +98,9 @@ function NuevoUsuario() {
             </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '25px', paddingTop: '20px', borderTop: '1px solid #eee' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '25px', paddingTop: '20px', borderTop: '1px solid #eee' }}>
             <button className="btn btn-secondary" onClick={() => navigate('/usuarios')}>CANCELAR</button>
-            <button className="btn btn-primary" onClick={handleGuardar} style={{ backgroundColor: '#10B981', border: 'none' }}>GUARDAR</button>
+            <button className="btn btn-primary" onClick={handleGuardar}>GUARDAR</button>
             </div>
         </div>
         </div>

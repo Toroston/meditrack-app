@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { forgotPassword, verifyCode, resetPassword } from '../services/api';
 
-// Pasos: 1 = email, 2 = código, 3 = nueva contraseña
 function ForgotPassword() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);

@@ -62,7 +62,7 @@ const ModalHistorialUsuario = ({ usuario, alCerrar }) => {
         <div style={overlayStyle}>
             <div style={modalStyle}>
                 <div style={headerStyle}>
-                    <h2 style={titleStyle}>Historial de Operaciones</h2>
+                    <h2 style={titleStyle}>Historial de operaciones</h2>
                     <button style={closeButtonStyle} onClick={alCerrar}>×</button>
                 </div>
 
@@ -118,7 +118,7 @@ const ModalHistorialUsuario = ({ usuario, alCerrar }) => {
                 </div>
 
                 <div style={footerStyle}>
-                    <button style={buttonStyle} onClick={alCerrar}>Cerrar historial</button>
+                    <button style={buttonStyle} onClick={alCerrar}>CERRAR</button>
                 </div>
             </div>
         </div>

@@ -75,6 +75,12 @@ public class Usuario {
         this.estadoActivo = estadoActivo; 
     }
 
-    public List<HistorialUsuario> getHistorial() { return historial; }
-    public void addHistorial(HistorialUsuario historial) { this.historial.add(historial); }
+    public List<HistorialUsuario> getHistorial() {
+        return historial;
+    }
+
+    public void addHistorial(HistorialUsuario historial) {
+        this.historial.add(historial);
+    }
+    
 }

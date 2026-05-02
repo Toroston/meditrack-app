@@ -100,4 +100,5 @@ public class AuthService {
         resetCodes.remove(email);
         System.out.println("[TRAZABILIDAD] Contrasena reseteada para: " + email);
     }
+    
 }

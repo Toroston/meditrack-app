@@ -131,7 +131,7 @@ const ModalHistorial = ({ historial, alCerrar }) => {
     <div className="modal-overlay" style={{ zIndex: 1000 }}>
       <div className="modal-content" style={{ maxWidth: '850px', width: '95%', position: 'relative' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h2 style={{ margin: 0 }}>Historial de Operaciones</h2>
+          <h2 style={{ margin: 0 }}>Historial de operaciones</h2>
           <button onClick={alCerrar} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', color: '#6B7280' }}>✕</button>
         </div>
 
@@ -186,7 +186,7 @@ const ModalHistorial = ({ historial, alCerrar }) => {
         </div>
 
         <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end' }}>
-          <button className="btn btn-secondary" onClick={alCerrar}>Cerrar historial</button>
+          <button className="btn btn-secondary" onClick={alCerrar}>CERRAR</button>
         </div>
 
         {motivoSeleccionado && <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.4)', zIndex: 15, borderRadius: '8px', backdropFilter: 'blur(2px)' }} onClick={() => setMotivoSeleccionado(null)} />}

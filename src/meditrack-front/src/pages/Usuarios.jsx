@@ -35,14 +35,14 @@ function Usuarios() {
         <div className="container">
             <div className="page-header-row">
                 <button className="btn btn-secondary" onClick={() => navigate('/')}>VOLVER</button>
-                <h1>Gestión del personal</h1>
+                <h1 style={{ fontSize: '24px', fontWeight: '800', color: '#111827' }}>Gestión del personal</h1>
             </div>
 
             <div className="card">
                 <div className="table-header-actions">
                     <input
                         className="search-input-user"
-                        placeholder="🔍 Buscar por Nombre o Email..."
+                        placeholder="Buscar por Nombre o Email..."
                         value={busqueda}
                         onChange={e => setBusqueda(e.target.value)}
                     />
@@ -57,7 +57,7 @@ function Usuarios() {
                 <table>
                     <thead>
                         <tr>
-                            <th>Nombre Completo</th>
+                            <th>Nombre completo</th>
                             <th>Email</th>
                             <th>Rol</th>
                             <th>Estado</th>

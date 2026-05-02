@@ -12,6 +12,8 @@ import NuevoUsuario from './pages/NuevoUsuario';
 import EditarUsuario from './pages/EditarUsuario';
 import MainMenu from './pages/MainMenu';
 import ForgotPassword from './pages/ForgotPassword';
+import Medicamentos from './pages/Medicamentos';
+import EditarMedicamento from './pages/EditarMedicamento';
 
 function App() {
   return (
@@ -29,6 +31,8 @@ function App() {
             <Route path="/usuarios" element={<Usuarios />} />
             <Route path="/usuarios/nuevo" element={<NuevoUsuario />} />
             <Route path="/usuarios/editar/:id" element={<ProtectedRoute roles={['SUPERVISOR','ADMINISTRADOR']}><EditarUsuario /></ProtectedRoute>} />
+            <Route path="/medicamentos" element={<Medicamentos />} />
+            <Route path="/medicamentos/editar/:id" element={<EditarMedicamento />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
