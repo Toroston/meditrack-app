@@ -12,6 +12,7 @@ import NuevoUsuario from './pages/NuevoUsuario';
 import EditarUsuario from './pages/EditarUsuario';
 import MainMenu from './pages/MainMenu';
 import ForgotPassword from './pages/ForgotPassword';
+import TrackingPublico from './pages/TrackingPublico';
 import Medicamentos from './pages/Medicamentos';
 import EditarMedicamento from './pages/EditarMedicamento';
 
@@ -22,6 +23,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/tracking" element={<TrackingPublico />} />
           <Route element={<ProtectedLayout />}>
             <Route path="/" element={<MainMenu />} />
             <Route path="/envios" element={<Home />} />

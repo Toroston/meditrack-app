@@ -8,11 +8,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.meditrack.back.app.model.Envio;
 import com.meditrack.back.app.model.EstadoEnvio;
 import com.meditrack.back.app.model.HistorialEstado;
+import com.meditrack.back.app.model.TrackingPublicoDTO;
 
 @Service
 public class EnvioService {
@@ -67,7 +70,7 @@ public class EnvioService {
         return envios.stream()
                 .filter(e -> e.getId().equals(id))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Envío no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Envío no encontrado"));
     }
 
     public Envio crear(Map<String, String> datos, String usuario) {
@@ -157,6 +160,35 @@ public class EnvioService {
 
     public boolean eliminar(String id) {
         return envios.removeIf(e -> e.getId().equals(id));
+    }
+
+    public TrackingPublicoDTO obtenerTrackingPublico(String id) {
+        if (id == null || id.trim().isEmpty()) {
+            throw new IllegalArgumentException("Tracking ID inválido");
+        }
+
+        String tracking = id.trim().toUpperCase();
+        Envio envio = buscarPorId(tracking);
+
+        String fecha = envio.getFechaCreacion();
+        String hora = envio.getHoraCreacion();
+
+        if(envio.getHistorial() != null && !envio.getHistorial().isEmpty()) {
+            HistorialEstado ultimoEvento = envio.getHistorial().get(envio.getHistorial().size() - 1);
+            if(ultimoEvento.getFecha() != null && !ultimoEvento.getFecha().isBlank()) {
+                fecha = ultimoEvento.getFecha();
+            }
+            if(ultimoEvento.getHora() != null && !ultimoEvento.getHora().isBlank()) {
+                hora = ultimoEvento.getHora();
+            }
+        }
+
+        return new TrackingPublicoDTO(
+            envio.getId(),
+            envio.getEstado() != null ? envio.getEstado().name() : "DESCONOCIDO",
+            fecha,
+            hora
+        );
     }
 
 }

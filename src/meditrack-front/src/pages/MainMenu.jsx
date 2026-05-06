@@ -1,10 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { 
-  Package, 
-  Users, 
-  Truck, 
+import {
+  Package,
+  Users,
+  Truck,
   ShieldAlert,
   TriangleRight,
   Pill,
