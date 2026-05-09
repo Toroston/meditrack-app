@@ -60,7 +60,36 @@ function Login() {
           <button className="btn btn-primary btn-full" type="submit" disabled={loading}>
             {loading ? 'INGRESANDO...' : 'INGRESAR'}
           </button>
-          
+
+          <button
+            className="btn btn-secondary btn-full"
+            type="button"
+            onClick={() => navigate('/tracking')}
+            style={{
+              marginTop: '10px',
+              backgroundColor: '#2563EB',
+              color: '#FFFFFF',
+              border: 'none',
+              transition: 'transform 0.05s ease, background-color 0.15s ease',
+              cursor: 'pointer'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#1E40AF';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#2563EB';
+              e.currentTarget.style.transform = 'scale(1)';
+            }}
+            onMouseDown={(e) => {
+              e.currentTarget.style.transform = 'scale(0.98)';
+            }}
+            onMouseUp={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+            }}
+          >
+            BUSCAR ENVÍO
+          </button>
+
           <button
             type="button"
             onClick={() => navigate('/forgot-password')}
