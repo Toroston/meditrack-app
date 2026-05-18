@@ -102,7 +102,7 @@ const ModalHistorialUsuario = ({ usuario, alCerrar }) => {
                                                 </span>
                                             </td>
                                             <td style={tdStyle}>
-                                                <span style={{ color: '#4b5563' }}>{item.autor}</span>
+                                                <span style={{ color: '#4b5563' }}>{item.autor?.nombre || 'Sistema'}</span>
                                             </td>
                                         </tr>
                                     ))

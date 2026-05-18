@@ -1,32 +1,61 @@
 package com.meditrack.back.app.model;
 
-import java.util.UUID;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+@Entity
+@Table(name = "usuarios")
 public class Usuario {
 
+    @Id
     private String id;
+
+    @Column(unique = true, nullable = false)
     private String email;
+
+    @Column(nullable = false)
     private String nombre;
+
+    @Column(unique = true, nullable = false)
     private String dni;
+
+    @Column(nullable = false)
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Role role;
-    private boolean estadoActivo;
+
+    @Column(name = "estado_activo", nullable = false)
+    private boolean estadoActivo = true;
+
+    @Column(name = "esta_bloqueado", nullable = false)
+    private boolean estaBloqueado = false;
+
+    @Column(name = "haciendo_entrega", nullable = false)
+    private boolean haciendoEntrega = false;
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HistorialUsuario> historial = new ArrayList<>();
 
     public Usuario() {
         this.estadoActivo = true;
+        this.estaBloqueado = false;
+        this.haciendoEntrega = false;
     }
 
     public Usuario(String email, String nombre, String dni, String password, Role role) {
-        this.id = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        this.id = "USR-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         this.email = email;
         this.nombre = nombre;
         this.dni = dni;
         this.password = password;
         this.role = role;
         this.estadoActivo = true;
+        this.estaBloqueado = false;
+        this.haciendoEntrega = false;
     }
 
     public String getId() { 
@@ -85,6 +114,22 @@ public class Usuario {
         this.estadoActivo = estadoActivo; 
     }
 
+    public boolean isEstaBloqueado() { 
+        return estaBloqueado; 
+    }
+
+    public void setEstaBloqueado(boolean estaBloqueado) { 
+        this.estaBloqueado = estaBloqueado; 
+    }
+
+    public boolean isHaciendoEntrega() { 
+        return haciendoEntrega; 
+    }
+
+    public void setHaciendoEntrega(boolean haciendoEntrega) { 
+        this.haciendoEntrega = haciendoEntrega; 
+    }
+
     public List<HistorialUsuario> getHistorial() {
         return historial;
     }
@@ -92,5 +137,4 @@ public class Usuario {
     public void addHistorial(HistorialUsuario historial) {
         this.historial.add(historial);
     }
-    
 }

@@ -63,11 +63,8 @@ public class MedicamentoController {
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
         try {
             autenticar(authHeader);
-            Medicamento envio = medicamentoService.listarTodos().stream()
-                    .filter(e -> e.getId().equals(id))
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Medicamento no encontrado"));
-            return ResponseEntity.ok(envio);
+
+            return ResponseEntity.ok(medicamentoService.obtenerPorId(id));
         } catch (RuntimeException e) {
             if (e.getMessage().contains("no encontrado")) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
@@ -81,10 +78,10 @@ public class MedicamentoController {
             @RequestParam String nombre,
             @RequestParam(required = false) String descripcion,
             @RequestParam(required = false) String presentacion,
-            @RequestParam int stock,
+            @RequestParam int cantidad,
             @RequestParam(required = false) String unidadMedida,
             @RequestParam(required = false) String laboratorio,
-            @RequestParam(required = false) String principioActivo,
+            @RequestParam(required = false) String monodroga,
             @RequestParam(defaultValue = "false") boolean cadenaFrio,
             @RequestParam(required = false) MultipartFile imagen,
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
@@ -102,10 +99,10 @@ public class MedicamentoController {
                     nombre,
                     descripcion,
                     presentacion,
-                    stock,
+                    cantidad,
                     unidadMedida,
                     laboratorio,
-                    principioActivo,
+                    monodroga,
                     cadenaFrio,
                     imageUrl);
 
@@ -126,10 +123,10 @@ public class MedicamentoController {
             @RequestParam String nombre,
             @RequestParam(required = false) String descripcion,
             @RequestParam(required = false) String presentacion,
-            @RequestParam int stock,
+            @RequestParam int cantidad,
             @RequestParam(required = false) String unidadMedida,
             @RequestParam(required = false) String laboratorio,
-            @RequestParam(required = false) String principioActivo,
+            @RequestParam(required = false) String monodroga,
             @RequestParam(defaultValue = "false") boolean cadenaFrio,
             @RequestParam(required = false) MultipartFile imagen,
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
@@ -142,10 +139,10 @@ public class MedicamentoController {
                     nombre,
                     descripcion,
                     presentacion,
-                    stock,
+                    cantidad,
                     unidadMedida,
                     laboratorio,
-                    principioActivo,
+                    monodroga,
                     cadenaFrio,
                     imageUrl);
 
@@ -210,10 +207,10 @@ public class MedicamentoController {
             String nombre,
             String descripcion,
             String presentacion,
-            int stock,
+            int cantidad,
             String unidadMedida,
             String laboratorio,
-            String principioActivo,
+            String monodroga,
             boolean cadenaFrio,
             String imageUrl) {
 
@@ -222,10 +219,10 @@ public class MedicamentoController {
         body.put("nombre", nombre);
         body.put("descripcion", descripcion);
         body.put("presentacion", presentacion);
-        body.put("stock", String.valueOf(stock));
+        body.put("cantidad", String.valueOf(cantidad));
         body.put("unidadMedida", unidadMedida);
         body.put("laboratorio", laboratorio);
-        body.put("principioActivo", principioActivo);
+        body.put("monodroga", monodroga);
         body.put("cadenaFrio", String.valueOf(cadenaFrio));
 
         if (imageUrl != null) {

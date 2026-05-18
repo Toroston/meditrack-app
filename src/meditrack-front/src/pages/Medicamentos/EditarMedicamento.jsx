@@ -119,7 +119,7 @@ function EditarMedicamento() {
                             marginTop: '6px',
                             color: '#6B7280'
                         }}>
-                            {form.principioActivo || 'Principio activo'}
+                            {form.monodroga || 'Monodroga'}
                         </p>
 
                         <label
@@ -158,8 +158,8 @@ function EditarMedicamento() {
                     </div>
 
                     <div className="form-group">
-                        <label>Principio Activo *</label>
-                        <input name="principioActivo" value={form.principioActivo || ''} onChange={handleChange} />
+                        <label>Monodroga *</label>
+                        <input name="monodroga" value={form.monodroga || ''} onChange={handleChange} />
                     </div>
 
                     <div className="form-group">
@@ -178,14 +178,33 @@ function EditarMedicamento() {
                     </div>
 
                     <div className="form-group">
-                        <label>Stock</label>
-                        <input type="number" name="stock" value={form.stock ?? ''} onChange={handleChange} min="0" />
+                        <label>Cantidad</label>
+                        <input type="number" name="cantidad" value={form.cantidad ?? ''} onChange={handleChange} min="0" />
                     </div>
 
                     <div className="form-group">
                         <label>Unidad</label>
-                        <input name="unidad" value={form.unidadMedida || ''} onChange={handleChange} placeholder="mg, ml, unidades..." />
+                        <input name="unidadMedida" value={form.unidadMedida || ''} onChange={handleChange} placeholder="mg, ml, unidades..." />
                     </div>
+                </div>
+
+                <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                    <label>Descripción</label>
+
+                    <textarea
+                        name="descripcion"
+                        value={form.descripcion || ''}
+                        onChange={handleChange}
+                        rows="4"
+                        placeholder="Descripción del medicamento..."
+                        style={{
+                            width: '100%',
+                            padding: '10px',
+                            borderRadius: '8px',
+                            border: '1px solid #D1D5DB',
+                            resize: 'vertical'
+                        }}
+                    />
                 </div>
 
                 <div style={{

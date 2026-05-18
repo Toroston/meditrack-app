@@ -25,7 +25,7 @@ function Medicamentos() {
         const term = busqueda.toLowerCase();
         return (
             m.nombre?.toLowerCase().includes(term) ||
-            m.principioActivo?.toLowerCase().includes(term) ||
+            m.monodroga?.toLowerCase().includes(term) ||
             m.laboratorio?.toLowerCase().includes(term)
         );
     });
@@ -56,7 +56,7 @@ function Medicamentos() {
                             <th>Medicamento</th>
                             <th>Laboratorio</th>
                             <th>Presentación</th>
-                            <th>Stock</th>
+                            <th>Cantidad</th>
                             <th>Estado</th>
                             <th style={{ textAlign: 'center' }}>Acciones</th>
                         </tr>
@@ -102,14 +102,14 @@ function Medicamentos() {
                                                 fontSize: '13px',
                                                 color: '#6B7280'
                                             }}>
-                                                {m.principioActivo}
+                                                {m.monodroga}
                                             </div>
                                         </div>
                                     </div>
                                 </td>
                                 <td>{m.laboratorio}</td>
                                 <td>{m.presentacion}</td>
-                                <td>{m.stock} {m.unidad}</td>
+                                <td>{m.cantidad} {m.unidadMedida}</td>
                                 <td>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                         <label className="switch">

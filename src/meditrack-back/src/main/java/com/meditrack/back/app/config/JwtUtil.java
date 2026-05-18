@@ -27,9 +27,10 @@ public class JwtUtil {
         this.expiration = expiration;
     }
 
-    public String generarToken(String email, String nombre, Role role) {
+    public String generarToken(String id, String email, String nombre, Role role) {
         return Jwts.builder()
             .subject(email)
+            .claim("id", id)
             .claim("nombre", nombre)
             .claim("role", role.name())
             .issuedAt(new Date())
@@ -47,13 +48,13 @@ public class JwtUtil {
                 .getPayload();
 
             String email  = claims.getSubject();
+            String id     = claims.get("id", String.class);
             String nombre = claims.get("nombre", String.class);
             Role   role   = Role.valueOf(claims.get("role", String.class));
 
-            return new Sesion(email, nombre, role);
+            return new Sesion(id, email, nombre, role);
         } catch (JwtException | IllegalArgumentException e) {
             throw new RuntimeException("Token inválido o expirado");
         }
     }
-
 }

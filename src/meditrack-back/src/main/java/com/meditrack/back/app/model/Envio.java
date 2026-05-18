@@ -1,32 +1,72 @@
 package com.meditrack.back.app.model;
 
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+@Entity
+@Table(name = "envios")
 public class Envio {
 
+    @Id
     private String id;
+
+    @Column(nullable = false)
     private String remitente;
+
+    @Column(nullable = false)
     private String destinatario;
+
+    @Column(name = "direccion_entrega", nullable = false)
     private String direccionEntrega;
+
+    @Column(nullable = false)
     private String origen;
+
+    @Column(nullable = false)
     private String destino;
+
+    @Column(name = "fecha_estimada")
     private String fechaEstimada;
+
+    @Column(name = "descripcion_carga")
     private String descripcionCarga;
+
     private String observaciones;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private EstadoEnvio estado;
+
     private String prioridad;
+    
+    @Column(name = "motivo_cancelacion")
     private String motivoCancelacion;
+
+    @Column(name = "firma_cancelacion")
     private String firmaCancelacion;
+
+    @Column(name = "fecha_cancelacion")
     private String fechaCancelacion;
-    private List<HistorialEstado> historial = new ArrayList<>();
+
+    @Column(name = "usuario_responsable")
     private String usuarioResponsable;
+
+    @Column(name = "repartidor_id")
     private String repartidorId;
+
+    @Column(name = "fecha_creacion")
     private String fechaCreacion;
+
+    @Column(name = "hora_creacion")
     private String horaCreacion;
+
+    @OneToMany(mappedBy = "envio", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<HistorialEstado> historial = new ArrayList<>();
 
     public Envio() {
         this.fechaCreacion = LocalDate.now().toString();
@@ -35,7 +75,7 @@ public class Envio {
 
     public Envio(String id, String remitente, String destinatario, String direccionEntrega, String origen, String destino,
         String fechaEstimada, String descripcionCarga, String observaciones, EstadoEnvio estado, String usuario) {
-        this.id = id;
+        this.id = "ENV-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         this.remitente = remitente;
         this.destinatario = destinatario;
         this.direccionEntrega = direccionEntrega;
@@ -139,6 +179,7 @@ public class Envio {
     }
 
     public void agregarHistorial(HistorialEstado entrada) { 
+        entrada.setEnvio(this);
         this.historial.add(entrada); 
     }
 

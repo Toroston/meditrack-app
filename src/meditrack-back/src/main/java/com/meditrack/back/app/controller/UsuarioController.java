@@ -31,6 +31,11 @@ public class UsuarioController {
         return authService.validar(authHeader.substring(7));
     }
 
+    private Usuario obtenerAutorDesdeSesion(Sesion sesion) {
+        return usuarioService.buscarPorEmail(sesion.getEmail())
+                .orElseThrow(() -> new RuntimeException("Usuario autor no encontrado en la base de datos"));
+    }
+
     @GetMapping
     public ResponseEntity<?> listarTodos(@RequestHeader(value = "Authorization", required = false) String authHeader) {
         try {
@@ -59,8 +64,8 @@ public class UsuarioController {
     public ResponseEntity<?> crear(@RequestBody Map<String, String> body, @RequestHeader(value = "Authorization", required = false) String authHeader) {
         try {
             Sesion sesion = autenticar(authHeader);
-            String usuario = sesion.getNombre();
-            Usuario nuevo = usuarioService.crear(body, sesion.getRole(), usuario);
+            Usuario autorCompleto = obtenerAutorDesdeSesion(sesion);
+            Usuario nuevo = usuarioService.crear(body, autorCompleto);
             return ResponseEntity.status(HttpStatus.CREATED).body(nuevo);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));
@@ -71,8 +76,8 @@ public class UsuarioController {
     public ResponseEntity<?> actualizar(@PathVariable String id, @RequestBody Map<String, String> body, @RequestHeader(value = "Authorization", required = false) String authHeader) {
         try {
             Sesion sesion = autenticar(authHeader);
-            String usuario = sesion.getNombre();
-            Usuario actualizado = usuarioService.actualizar(id, body, sesion.getRole(), usuario);
+            Usuario autorCompleto = obtenerAutorDesdeSesion(sesion);
+            Usuario actualizado = usuarioService.actualizar(id, body, autorCompleto);
             return ResponseEntity.ok(actualizado);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
@@ -83,13 +88,11 @@ public class UsuarioController {
     public ResponseEntity<?> toggleEstado(@PathVariable String id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
         try {
             Sesion sesion = autenticar(authHeader);
-            String usuario = sesion.getNombre();
-            Usuario actualizado = usuarioService.toggleEstado(id, sesion.getRole(), usuario);
+            Usuario autorCompleto = obtenerAutorDesdeSesion(sesion);
+            Usuario actualizado = usuarioService.toggleEstado(id, autorCompleto);
             return ResponseEntity.ok(actualizado);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));
         }
     }
-    
-
 }

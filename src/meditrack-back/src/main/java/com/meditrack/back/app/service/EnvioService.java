@@ -2,7 +2,6 @@ package com.meditrack.back.app.service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -16,11 +15,17 @@ import com.meditrack.back.app.model.Envio;
 import com.meditrack.back.app.model.EstadoEnvio;
 import com.meditrack.back.app.model.HistorialEstado;
 import com.meditrack.back.app.model.TrackingPublicoDTO;
+import com.meditrack.back.app.repository.EnvioRepository;
+
 
 @Service
 public class EnvioService {
 
-    private List<Envio> envios = new ArrayList<>();
+    private final EnvioRepository envioRepository;
+
+    public EnvioService(EnvioRepository envioRepository) {
+        this.envioRepository = envioRepository;
+    }
 
     private void registrarHistorial(Envio e, String tipo, EstadoEnvio estado, String detalle, String f, String h, String u) {
         HistorialEstado evento = new HistorialEstado();
@@ -63,13 +68,11 @@ public class EnvioService {
     }
 
     public List<Envio> listarTodos() {
-        return envios;
+        return envioRepository.findAll();
     }
 
     public Envio buscarPorId(String id) {
-        return envios.stream()
-                .filter(e -> e.getId().equals(id))
-                .findFirst()
+        return envioRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Envío no encontrado"));
     }
 
@@ -95,8 +98,7 @@ public class EnvioService {
 
         registrarHistorial(nuevo, "CREACION", EstadoEnvio.PENDIENTE, "Creación del envío", fecha, hora, usuario);
 
-        envios.add(nuevo);
-        return nuevo;
+        return envioRepository.save(nuevo);
     }
 
     public Envio actualizar(String id, Map<String, String> body, String usuario) {
@@ -118,7 +120,7 @@ public class EnvioService {
                 }
             }
         }
-        return envio;
+        return envioRepository.save(envio);
     }
 
     public Envio actualizarEstado(String id, EstadoEnvio nuevoEstado, String usuario, String repartidorId) {
@@ -140,7 +142,7 @@ public class EnvioService {
             }
             registrarHistorial(envio, "CAMBIO_ESTADO", nuevoEstado, detalle, LocalDate.now().toString(), LocalTime.now().toString().substring(0, 5), usuario);
         }
-        return envio;
+        return envioRepository.save(envio);
     }
 
     public Envio reasignarRepartidor(String id, String nuevoRepartidorId, String usuario) {
@@ -156,7 +158,7 @@ public class EnvioService {
         String detalle = "Cambio de repartidor: " + repartidorAnterior + " → " + nuevoRepartidorId;
         registrarHistorial(envio, "REASIGNACION", envio.getEstado(), detalle, LocalDate.now().toString(), LocalTime.now().toString().substring(0, 5), usuario);
 
-        return envio;
+        return envioRepository.save(envio);
     }
 
     public Envio cancelar(String id, String motivo, String firma, String fecha, String hora, String usuario) {
@@ -181,11 +183,11 @@ public class EnvioService {
         
         registrarHistorial(envio, "CANCELACION", EstadoEnvio.CANCELADO, "Motivo: " + motivo, fecha, hora, usuario);
         
-        return envio;
+        return envioRepository.save(envio);
     }
 
-    public boolean eliminar(String id) {
-        return envios.removeIf(e -> e.getId().equals(id));
+    public void eliminar(String id) {
+        envioRepository.deleteById(id);
     }
 
     public TrackingPublicoDTO obtenerTrackingPublico(String id) {

@@ -1,38 +1,67 @@
 package com.meditrack.back.app.model;
 
 import java.util.UUID;
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "medicamentos")
 public class Medicamento {
+    @Id
     private String id;
-    private String descripcion;
+
+    @Column(nullable = false)
     private String nombre;
+
+    @Column(length = 1000)
+    private String descripcion;
+
+    @Column(nullable = false)
     private String presentacion;
-    private int stock;
+
+    @Column(nullable = false)
+    private int cantidad;
+
+    @Column(nullable = false)
     private String unidadMedida;
+
+    @Column(nullable = false)
     private String laboratorio;
-    private String principioActivo;
-    private boolean estadoActivo;
-    private boolean cadenaFrio;
+
+    @Column(nullable = false)
+    private String monodroga;
+
+    @Column(name = "estado_activo")
+    private boolean estadoActivo = true;
+
+    @Column(name = "cadena_frio")
+    private boolean cadenaFrio = false;
+
+    @Column(name = "imagen_url")
     private String imagenUrl;
 
-    public Medicamento(String nombre, String descripcion, String presentacion, int stock, String unidadMedida,
-            String laboratorio, String principioActivo, boolean cadenaFrio, String imagenUrl) {
-        this.id = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+    public Medicamento(String nombre, String descripcion, String presentacion, int cantidad, String unidadMedida,
+            String laboratorio, String monodroga, boolean cadenaFrio, String imagenUrl) {
         this.descripcion = descripcion;
         this.nombre = nombre;
         this.presentacion = presentacion;
         this.unidadMedida = unidadMedida;
-        this.stock = stock;
+        this.cantidad = cantidad;
         this.estadoActivo = true;
         this.laboratorio = laboratorio;
-        this.principioActivo = principioActivo;
+        this.monodroga = monodroga;
         this.cadenaFrio = cadenaFrio;
         this.imagenUrl = imagenUrl;
     }
 
     public Medicamento() {
-        this.id = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         this.estadoActivo = true;
+    }
+
+    @PrePersist
+    public void generarId() {
+        if (this.id == null) {
+            this.id = "MED-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        }
     }
 
     public String getId() {
@@ -91,12 +120,12 @@ public class Medicamento {
         this.cadenaFrio = cadenaFrio;
     }
 
-    public void setStock(int stock){
-        this.stock = stock;
+    public void setCantidad(int cantidad){
+        this.cantidad = cantidad;
     }
 
-    public int getStock(){
-        return this.stock;
+    public int getCantidad(){
+        return this.cantidad;
     }
 
     public void setLaboratorio(String laboratorio) {
@@ -107,12 +136,12 @@ public class Medicamento {
         return this.laboratorio;
     }
 
-    public void setPrincipioActivo(String principio) {
-        this.principioActivo = principio;
+    public void setMonodroga(String monodroga) {
+        this.monodroga = monodroga;
     }
 
-    public String getPrincipioActivo() {
-        return this.principioActivo;
+    public String getMonodroga() {
+        return this.monodroga;
     }
 
     public String getImagenUrl() {
