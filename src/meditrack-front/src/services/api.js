@@ -355,6 +355,51 @@ export async function toggleEstadoUsuario(id) {
   }
 }
 
+export async function getRutas() {
+  const res = await fetch(`${BASE_URL}/api/rutas`, {
+    headers: { ...getAuthHeaders() },
+  });
+  await handleResponse(res);
+  if (!res.ok) throw new Error('Error al obtener rutas');
+  return res.json();
+}
+
+export async function getRutaById(id) {
+  const res = await fetch(`${BASE_URL}/api/rutas/${id}`, {
+    headers: { ...getAuthHeaders() },
+  });
+  await handleResponse(res);
+  if (!res.ok) throw new Error('Ruta no encontrada');
+  return res.json();
+}
+
+export async function createRuta(data) {
+  const res = await fetch(`${BASE_URL}/api/rutas`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+    body: JSON.stringify(data),
+  });
+  await handleResponse(res);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Error al crear ruta');
+  }
+  return res.json();
+}
+
+export async function finalizarRuta(id) {
+  const res = await fetch(`${BASE_URL}/api/rutas/${id}/finalizar`, {
+    method: 'PUT',
+    headers: { ...getAuthHeaders() },
+  });
+  await handleResponse(res);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Error al finalizar ruta');
+  }
+  return res.json();
+}
+
 export async function getTrackingPublico(id) {
   const trackingId = (id || "").trim();
   if (!trackingId) throw new Error("Ingresá un Tracking ID");

@@ -16,6 +16,9 @@ import Medicamentos from './pages/Medicamentos/Medicamentos';
 import EditarMedicamento from './pages/Medicamentos/EditarMedicamento';
 import NuevoMedicamento from './pages/Medicamentos/NuevoMedicamento';
 import TrackingPublico from './pages/TrackingPublico';
+import Rutas from './pages/Rutas/Rutas';
+import NuevaRuta from './pages/Rutas/NuevaRuta';
+import DetalleRuta from './pages/Rutas/DetalleRuta';
 
 function App() {
   return (
@@ -34,6 +37,9 @@ function App() {
             <Route path="/usuarios" element={<Usuarios />} />
             <Route path="/usuarios/nuevo" element={<NuevoUsuario />} />
             <Route path="/usuarios/editar/:id" element={<ProtectedRoute roles={['SUPERVISOR','ADMINISTRADOR']}><EditarUsuario /></ProtectedRoute>} />
+            <Route path="/rutas" element={<Rutas />} />
+            <Route path="/rutas/nueva" element={<ProtectedRoute roles={['SUPERVISOR','ADMINISTRADOR']}><NuevaRuta /></ProtectedRoute>} />
+            <Route path="/rutas/:id" element={<DetalleRuta />} />
             <Route path="/medicamentos" element={<Medicamentos />} />
             <Route path="/medicamentos/editar/:id" element={<EditarMedicamento />} />
             <Route path="/medicamentos/nuevoMedicamento" element={<NuevoMedicamento />} />
