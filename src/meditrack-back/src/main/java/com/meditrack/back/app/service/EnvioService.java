@@ -2,29 +2,35 @@ package com.meditrack.back.app.service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.meditrack.back.app.model.DetalleEnvio;
 import com.meditrack.back.app.model.Envio;
 import com.meditrack.back.app.model.EstadoEnvio;
 import com.meditrack.back.app.model.HistorialEstado;
+import com.meditrack.back.app.model.Medicamento;
 import com.meditrack.back.app.model.TrackingPublicoDTO;
 import com.meditrack.back.app.repository.EnvioRepository;
-
+import com.meditrack.back.app.repository.MedicamentoRepository;
 
 @Service
 public class EnvioService {
 
     private final EnvioRepository envioRepository;
+    private final MedicamentoRepository medicamentoRepository;
 
-    public EnvioService(EnvioRepository envioRepository) {
+    public EnvioService(EnvioRepository envioRepository, MedicamentoRepository medicamentoRepository) {
         this.envioRepository = envioRepository;
+        this.medicamentoRepository = medicamentoRepository;
     }
 
     private void registrarHistorial(Envio e, String tipo, EstadoEnvio estado, String detalle, String f, String h, String u) {
@@ -38,35 +44,6 @@ public class EnvioService {
         e.agregarHistorial(evento);
     }
 
-    private String obtenerValorCampo(Envio e, String campo) {
-        switch (campo) {
-            case "remitente": return e.getRemitente();
-            case "destinatario": return e.getDestinatario();
-            case "descripcionCarga": return e.getDescripcionCarga();
-            case "direccionEntrega": return e.getDireccionEntrega();
-            case "origen": return e.getOrigen();
-            case "destino": return e.getDestino();
-            case "fechaEstimada": return e.getFechaEstimada();
-            case "prioridad": return e.getPrioridad();
-            case "observaciones": return e.getObservaciones();
-            default: return "";
-        }
-    }
-
-    private void asignarValorCampo(Envio e, String campo, String valor) {
-        switch (campo) {
-            case "remitente": e.setRemitente(valor); break;
-            case "destinatario": e.setDestinatario(valor); break;
-            case "descripcionCarga": e.setDescripcionCarga(valor); break;
-            case "direccionEntrega": e.setDireccionEntrega(valor); break;
-            case "origen": e.setOrigen(valor); break;
-            case "destino": e.setDestino(valor); break;
-            case "fechaEstimada": e.setFechaEstimada(valor); break;
-            case "prioridad": e.setPrioridad(valor); break;
-            case "observaciones": e.setObservaciones(valor); break;
-        }
-    }
-
     public List<Envio> listarTodos() {
         return envioRepository.findAll();
     }
@@ -76,113 +53,172 @@ public class EnvioService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Envío no encontrado"));
     }
 
-    public Envio crear(Map<String, String> datos, String usuario) {
-        Envio nuevo = new Envio();
+    @Transactional
+    public Envio crear(Envio nuevo, String usuario) {
         nuevo.setId(UUID.randomUUID().toString().substring(0, 8).toUpperCase());
-        nuevo.setRemitente(datos.get("remitente"));
-        nuevo.setDestinatario(datos.get("destinatario"));
-        nuevo.setDescripcionCarga(datos.get("descripcionCarga"));
-        nuevo.setDireccionEntrega(datos.get("direccionEntrega"));
-        nuevo.setOrigen(datos.get("origen"));
-        nuevo.setDestino(datos.get("destino"));
-        nuevo.setFechaEstimada(datos.get("fechaEstimada"));
-        nuevo.setPrioridad(datos.get("prioridad"));
-        nuevo.setObservaciones(datos.get("observaciones"));
         nuevo.setEstado(EstadoEnvio.PENDIENTE);
         nuevo.setUsuarioResponsable(usuario);
+        nuevo.setFechaCreacion(LocalDate.now().toString());
+        nuevo.setHoraCreacion(LocalTime.now().toString().substring(0, 5));
 
-        String fecha = LocalDate.now().toString();
-        String hora = LocalTime.now().toString().substring(0, 5);
-        nuevo.setFechaCreacion(fecha);
-        nuevo.setHoraCreacion(hora);
-
-        registrarHistorial(nuevo, "CREACION", EstadoEnvio.PENDIENTE, "Creación del envío", fecha, hora, usuario);
-
-        return envioRepository.save(nuevo);
-    }
-
-    public Envio actualizar(String id, Map<String, String> body, String usuario) {
-        Envio envio = buscarPorId(id);
-        String fecha = LocalDate.now().toString();
-        String hora = LocalTime.now().toString().substring(0, 5);
-        
-        String[] campos = {"remitente", "destinatario", "descripcionCarga", "direccionEntrega", "origen", "destino", "fechaEstimada", "prioridad", "observaciones"};
-
-        for (String campo : campos) {
-            if (body.containsKey(campo)) {
-                String valorNuevo = body.get(campo);
-                String valorViejo = obtenerValorCampo(envio, campo);
-
-                if (!Objects.equals(valorViejo, valorNuevo)) {
-                    String detalle = campo.toUpperCase() + ": " + (valorViejo == null || valorViejo.isEmpty() ? "(vacío)" : valorViejo) + " → " + valorNuevo;
-                    registrarHistorial(envio, "EDICION", envio.getEstado(), detalle, fecha, hora, usuario);
-                    asignarValorCampo(envio, campo, valorNuevo);
+        if (nuevo.getDetalles() != null) {
+            for (DetalleEnvio detalle : nuevo.getDetalles()) {
+                detalle.setEnvio(nuevo); 
+                
+                if (detalle.getMedicamento() != null && detalle.getMedicamento().getId() != null) {
+                    Medicamento medReal = medicamentoRepository.findById(detalle.getMedicamento().getId())
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Medicamento no encontrado"));
+                    detalle.setMedicamento(medReal);
                 }
             }
         }
+
+        registrarHistorial(nuevo, "CREACION", EstadoEnvio.PENDIENTE, "Creación del envío", nuevo.getFechaCreacion(), nuevo.getHoraCreacion(), usuario);
+        return envioRepository.save(nuevo);
+    }
+
+    @Transactional
+    public Envio actualizar(String id, Envio datosNuevos, String usuario) {
+        Envio envio = buscarPorId(id);
+        String fecha = LocalDate.now().toString();
+        String hora = LocalTime.now().toString().substring(0, 5);
+
+        Map<String, Integer> medicamentosAntes = new HashMap<>();
+        if (envio.getDetalles() != null) {
+            for (DetalleEnvio d : envio.getDetalles()) {
+                if (d.getMedicamento() != null) {
+                    medicamentosAntes.put(d.getMedicamento().getNombre(), d.getCantidad());
+                }
+            }
+        }
+
+        envio.setRemitente(datosNuevos.getRemitente());
+        envio.setDestinatario(datosNuevos.getDestinatario());
+        envio.setDireccionEntrega(datosNuevos.getDireccionEntrega());
+        envio.setOrigen(datosNuevos.getOrigen());
+        envio.setDestino(datosNuevos.getDestino());
+        envio.setFechaEstimada(datosNuevos.getFechaEstimada());
+        envio.setDescripcionCarga(datosNuevos.getDescripcionCarga());
+        envio.setPrioridad(datosNuevos.getPrioridad());
+        envio.setObservaciones(datosNuevos.getObservaciones());
+
+        if (datosNuevos.getDetalles() != null) {
+            List<DetalleEnvio> detallesActuales = envio.getDetalles();
+            List<DetalleEnvio> detallesParaMantener = new ArrayList<>();
+
+            for (DetalleEnvio detalleNuevo : datosNuevos.getDetalles()) {
+                if (detalleNuevo.getMedicamento() != null && detalleNuevo.getMedicamento().getId() != null) {
+                    Medicamento medReal = medicamentoRepository.findById(detalleNuevo.getMedicamento().getId())
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Medicamento no encontrado"));
+                    detalleNuevo.setMedicamento(medReal);
+                }
+
+                if (detalleNuevo.getIdDetalle() != null) {
+                    DetalleEnvio detalleExistente = detallesActuales.stream()
+                            .filter(d -> d.getIdDetalle().equals(detalleNuevo.getIdDetalle()))
+                            .findFirst()
+                            .orElse(null);
+
+                    if (detalleExistente != null) {
+                        detalleExistente.setCantidad(detalleNuevo.getCantidad());
+                        detalleExistente.setLote(detalleNuevo.getLote());
+                        detalleExistente.setFechaVencimiento(detalleNuevo.getFechaVencimiento());
+                        detalleExistente.setMedicamento(detalleNuevo.getMedicamento());
+                        detallesParaMantener.add(detalleExistente);
+                    } else {
+                        detalleNuevo.setEnvio(envio);
+                        detallesParaMantener.add(detalleNuevo);
+                    }
+                } else {
+                    detalleNuevo.setEnvio(envio);
+                    detallesParaMantener.add(detalleNuevo);
+                }
+            }
+
+            detallesActuales.retainAll(detallesParaMantener);
+            for (DetalleEnvio d : detallesParaMantener) {
+                if (!detallesActuales.contains(d)) {
+                    envio.agregarDetalle(d);
+                }
+            }
+        } else {
+            if (envio.getDetalles() != null) {
+                envio.getDetalles().clear();
+            }
+        }
+
+        Map<String, Integer> medicamentosDespues = new HashMap<>();
+        if (envio.getDetalles() != null) {
+            for (DetalleEnvio d : envio.getDetalles()) {
+                if (d.getMedicamento() != null) {
+                    medicamentosDespues.put(d.getMedicamento().getNombre(), d.getCantidad());
+                }
+            }
+        }
+
+        boolean huboCambiosMedicamentos = false;
+
+        for (Map.Entry<String, Integer> entry : medicamentosDespues.entrySet()) {
+            String nombreMed = entry.getKey();
+            Integer cantNueva = entry.getValue();
+
+            if (!medicamentosAntes.containsKey(nombreMed)) {
+                registrarHistorial(envio, "EDICION", envio.getEstado(), "+ " + nombreMed + " x" + cantNueva, fecha, hora, usuario);
+                huboCambiosMedicamentos = true;
+            } else {
+                Integer cantAntigua = medicamentosAntes.get(nombreMed);
+                if (!cantAntigua.equals(cantNueva)) {
+                    registrarHistorial(envio, "EDICION", envio.getEstado(), nombreMed + " x" + cantAntigua + " → " + cantNueva, fecha, hora, usuario);
+                    huboCambiosMedicamentos = true;
+                }
+            }
+        }
+
+        for (String nombreMed : medicamentosAntes.keySet()) {
+            if (!medicamentosDespues.containsKey(nombreMed)) {
+                registrarHistorial(envio, "EDICION", envio.getEstado(), "[-] " + nombreMed, fecha, hora, usuario);
+                huboCambiosMedicamentos = true;
+            }
+        }
+
+        if (!huboCambiosMedicamentos) {
+            registrarHistorial(envio, "EDICION", envio.getEstado(), "Envío actualizado", fecha, hora, usuario);
+        }
+
         return envioRepository.save(envio);
     }
 
+    @Transactional
     public Envio actualizarEstado(String id, EstadoEnvio nuevoEstado, String usuario, String repartidorId) {
         Envio envio = buscarPorId(id);
-        EstadoEnvio estadoViejo = envio.getEstado();
-        
         if (nuevoEstado == EstadoEnvio.ASIGNADO) {
-            if (repartidorId == null || repartidorId.trim().isEmpty()) {
-                throw new IllegalArgumentException("Debe seleccionar un repartidor para pasar a estado ASIGNADO");
-            }
             envio.setRepartidorId(repartidorId);
         }
-        
-        if (estadoViejo != nuevoEstado) {
-            envio.setEstado(nuevoEstado);
-            String detalle = estadoViejo.name().replace("_", " ") + " → " + nuevoEstado.name().replace("_", " ");
-            if (nuevoEstado == EstadoEnvio.ASIGNADO) {
-                detalle += " (Repartidor ID: " + repartidorId + ")";
-            }
-            registrarHistorial(envio, "CAMBIO_ESTADO", nuevoEstado, detalle, LocalDate.now().toString(), LocalTime.now().toString().substring(0, 5), usuario);
-        }
+        envio.setEstado(nuevoEstado);
+        registrarHistorial(envio, "CAMBIO_ESTADO", nuevoEstado, "Cambio a " + nuevoEstado, LocalDate.now().toString(), LocalTime.now().toString().substring(0, 5), usuario);
         return envioRepository.save(envio);
     }
 
+    @Transactional
     public Envio reasignarRepartidor(String id, String nuevoRepartidorId, String usuario) {
         Envio envio = buscarPorId(id);
-
         if (nuevoRepartidorId == null || nuevoRepartidorId.trim().isEmpty()) {
             throw new IllegalArgumentException("El ID del nuevo repartidor es obligatorio");
         }
-
         String repartidorAnterior = envio.getRepartidorId() != null ? envio.getRepartidorId() : "Sin asignar";
         envio.setRepartidorId(nuevoRepartidorId);
-
-        String detalle = "Cambio de repartidor: " + repartidorAnterior + " → " + nuevoRepartidorId;
-        registrarHistorial(envio, "REASIGNACION", envio.getEstado(), detalle, LocalDate.now().toString(), LocalTime.now().toString().substring(0, 5), usuario);
-
+        registrarHistorial(envio, "REASIGNACION", envio.getEstado(), "Cambio de repartidor: " + repartidorAnterior + " → " + nuevoRepartidorId, LocalDate.now().toString(), LocalTime.now().toString().substring(0, 5), usuario);
         return envioRepository.save(envio);
     }
 
+    @Transactional
     public Envio cancelar(String id, String motivo, String firma, String fecha, String hora, String usuario) {
         Envio envio = buscarPorId(id);
-
-        if (!envio.getEstado().permiteCancelacion()) {
-            throw new IllegalArgumentException("No se puede cancelar un envío en estado: " + envio.getEstado());
-        }
-
-        if (motivo == null || motivo.isBlank()) {
-            throw new IllegalArgumentException("El motivo de cancelación es obligatorio");
-        }
-
-        if (firma == null || firma.isBlank()) {
-            throw new IllegalArgumentException("La firma es obligatoria");
-        }
-
         envio.setEstado(EstadoEnvio.CANCELADO);
         envio.setMotivoCancelacion(motivo);
         envio.setFirmaCancelacion(firma);
         envio.setFechaCancelacion(fecha + " " + hora);
-        
-        registrarHistorial(envio, "CANCELACION", EstadoEnvio.CANCELADO, "Motivo: " + motivo, fecha, hora, usuario);
-        
+        registrarHistorial(envio, "CANCELACION", EstadoEnvio.CANCELADO, motivo, fecha, hora, usuario);
         return envioRepository.save(envio);
     }
 
@@ -191,32 +227,7 @@ public class EnvioService {
     }
 
     public TrackingPublicoDTO obtenerTrackingPublico(String id) {
-        if (id == null || id.trim().isEmpty()) {
-            throw new IllegalArgumentException("Tracking ID inválido");
-        }
-
-        String tracking = id.trim().toUpperCase();
-        Envio envio = buscarPorId(tracking);
-
-        String fecha = envio.getFechaCreacion();
-        String hora = envio.getHoraCreacion();
-
-        if(envio.getHistorial() != null && !envio.getHistorial().isEmpty()) {
-            HistorialEstado ultimoEvento = envio.getHistorial().get(envio.getHistorial().size() - 1);
-            if(ultimoEvento.getFecha() != null && !ultimoEvento.getFecha().isBlank()) {
-                fecha = ultimoEvento.getFecha();
-            }
-            if(ultimoEvento.getHora() != null && !ultimoEvento.getHora().isBlank()) {
-                hora = ultimoEvento.getHora();
-            }
-        }
-
-        return new TrackingPublicoDTO(
-            envio.getId(),
-            envio.getEstado() != null ? envio.getEstado().name() : "DESCONOCIDO",
-            fecha,
-            hora
-        );
+        Envio envio = buscarPorId(id);
+        return new TrackingPublicoDTO(envio.getId(), envio.getEstado().name(), envio.getFechaCreacion(), envio.getHoraCreacion());
     }
-
 }

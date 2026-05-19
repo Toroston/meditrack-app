@@ -145,7 +145,14 @@ export async function updateEnvio(id, data) {
     destino: data.destino,
     fechaEstimada: data.fechaEstimada,
     prioridad: data.prioridad,
-    observaciones: data.observaciones
+    observaciones: data.observaciones,
+    detalles: data.detalles.map(d => ({
+      id: d.id,
+      medicamento: d.medicamento,
+      cantidad: d.cantidad,
+      lote: d.lote,
+      fechaVencimiento: d.fechaVencimiento
+    }))
   };
 
   const res = await fetch(`${BASE_URL}/api/envios/${id}`, {
@@ -265,7 +272,6 @@ export async function updateUsuario(id, data) {
   return res.json(); 
 }
 
-// --- Medicamentos (stubs — conectar cuando exista el modelo) ---
 export async function getMedicamentos() {
   const res = await fetch(`${BASE_URL}/api/medicamentos`, {
     headers: { ...getAuthHeaders() },
@@ -427,7 +433,6 @@ export async function getTrackingPublico(id) {
           ? "Tracking ID inválido"
           : "Error al consultar tracking";
 
-
     const limpio =
     !msgFromJson || msgFromJson.toLowerCase() === "not found"
     ? null: msgFromJson;
@@ -436,4 +441,4 @@ export async function getTrackingPublico(id) {
   }
 
   return data;
-} 
+}

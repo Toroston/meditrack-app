@@ -1,12 +1,16 @@
 package com.meditrack.back.app.model;
 
-import jakarta.persistence.*;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "envios")
@@ -68,14 +72,15 @@ public class Envio {
     @OneToMany(mappedBy = "envio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HistorialEstado> historial = new ArrayList<>();
 
+    @OneToMany(mappedBy = "envio", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DetalleEnvio> detalles = new ArrayList<>();
+
     public Envio() {
-        this.fechaCreacion = LocalDate.now().toString();
-        this.horaCreacion = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
     }
 
     public Envio(String id, String remitente, String destinatario, String direccionEntrega, String origen, String destino,
-        String fechaEstimada, String descripcionCarga, String observaciones, EstadoEnvio estado, String usuario) {
-        this.id = "ENV-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+                 String fechaEstimada, String descripcionCarga, String observaciones, EstadoEnvio estado, String usuario) {
+        this.id = id;
         this.remitente = remitente;
         this.destinatario = destinatario;
         this.direccionEntrega = direccionEntrega;
@@ -86,8 +91,6 @@ public class Envio {
         this.observaciones = observaciones;
         this.estado = estado;
         this.usuarioResponsable = usuario;
-        this.fechaCreacion = LocalDate.now().toString();
-        this.horaCreacion = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
     }
 
     public String getId() { 
@@ -146,12 +149,12 @@ public class Envio {
         this.fechaEstimada = v; 
     }
 
-    public String getDescripcionCarga() { 
-        return descripcionCarga; 
+    public String getDescripcionCarga(){
+        return descripcionCarga;
     }
 
-    public void setDescripcionCarga(String v) { 
-        this.descripcionCarga = v; 
+    public void setDescripcionCarga(String v){
+        this.descripcionCarga = v;
     }
 
     public String getObservaciones() { 
@@ -181,6 +184,30 @@ public class Envio {
     public void agregarHistorial(HistorialEstado entrada) { 
         entrada.setEnvio(this);
         this.historial.add(entrada); 
+    }
+
+    public List<DetalleEnvio> getDetalles() {
+        return detalles;
+    }
+
+    public void setDetalles(List<DetalleEnvio> detalles) {
+        if (this.detalles != null) {
+            this.detalles.clear();
+            if (detalles != null) {
+                for (DetalleEnvio d : detalles) {
+                    this.agregarDetalle(d);
+                }
+            }
+        } else {
+            this.detalles = detalles;
+        }
+    }
+
+    public void agregarDetalle(DetalleEnvio detalle) {
+        if (detalle != null) {
+            detalle.setEnvio(this);
+            this.detalles.add(detalle);
+        }
     }
 
     public String getPrioridad() { 
@@ -246,5 +273,4 @@ public class Envio {
     public void setFechaCancelacion(String fechaCancelacion) { 
         this.fechaCancelacion = fechaCancelacion; 
     }
-    
 }

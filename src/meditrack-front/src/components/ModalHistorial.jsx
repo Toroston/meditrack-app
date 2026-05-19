@@ -25,27 +25,77 @@ const ModalHistorial = ({ historial, alCerrar }) => {
   };
 
   const formatDetalle = (detalle, tipo) => {
-    if (tipo !== 'CAMBIO_ESTADO' || !detalle.includes('→')) return detalle;
+    if (!detalle) return '-';
 
-    const estados = detalle.split('→').map(s => s.trim());
-    
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-        {estados.map((estado, idx) => (
-          <React.Fragment key={idx}>
-            <span style={{ 
-              color: ESTADO_COLORS[estado.replace(/ /g, '_')] || '#374151',
-              fontWeight: '700',
-              textTransform: 'uppercase',
-              fontSize: '12px'
-            }}>
-              {estado}
-            </span>
-            {idx < estados.length - 1 && <span style={{ color: '#9CA3AF' }}>→</span>}
-          </React.Fragment>
-        ))}
-      </div>
-    );
+    if (tipo === 'EDICION') {
+      if (detalle.startsWith('+') || detalle.includes('[+]')) {
+        const sinPrefijo = detalle.replace(/^(\+)\s?|\[\+\]\s?/, '');
+        const partes = sinPrefijo.split(' x');
+        const nombre = partes[0] ? partes[0].trim() : 'Medicamento';
+        const cantidad = partes[1] ? partes[1].trim() : '1';
+
+        return (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#374151', fontWeight: '500' }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#D1FAE5', color: '#065F46', width: '22px', height: '22px', borderRadius: '50%', fontSize: '14px', fontWeight: 'bold' }}>+</span>
+            <span style={{ fontSize: '13px' }}>{nombre} <b style={{ color: '#065F46', marginLeft: '4px' }}>x {cantidad}</b></span>
+          </div>
+        );
+      }
+
+      if (detalle.startsWith('x ') || detalle.includes('[-]')) {
+        const nombre = detalle.replace(/^x\s?|\[-\]\s?/, '').split(' x')[0].trim();
+        return (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#374151', fontWeight: '500' }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FEE2E2', color: '#991B1B', width: '22px', height: '22px', borderRadius: '50%', fontSize: '11px', fontWeight: 'bold' }}>✕</span>
+            <span style={{ fontSize: '13px', color: '#4B5563' }}>{nombre}</span>
+          </div>
+        );
+      }
+
+      if (detalle.includes('→')) {
+        const partesFlecha = detalle.split('→');
+        const fragmentoIzquierdo = partesFlecha[0].trim();
+        const cantNueva = partesFlecha[1] ? partesFlecha[1].trim() : '0';
+        
+        const cantAntesMatch = fragmentoIzquierdo.match(/x\s?(\d+)$/);
+        const cantAntes = cantAntesMatch ? cantAntesMatch[1] : '0';
+        const nombre = fragmentoIzquierdo.replace(/x\s?\d+$/, '').trim();
+
+        return (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#374151', fontWeight: '500' }}>
+            <span style={{ fontSize: '13px' }}>{nombre}</span>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', backgroundColor: '#EFF6FF', padding: '3px 8px', borderRadius: '6px', fontSize: '12px', border: '1px solid #BFDBFE' }}>
+              <span style={{ color: '#4B5563', fontWeight: '600' }}>{cantAntes}</span>
+              <span style={{ color: '#9CA3AF', fontWeight: 'bold' }}>→</span>
+              <span style={{ color: '#1E40AF', fontWeight: '800' }}>{cantNueva}</span>
+            </div>
+          </div>
+        );
+      }
+    }
+
+    if (tipo === 'CAMBIO_ESTADO' && detalle.includes('→')) {
+      const estados = detalle.split('→').map(s => s.trim());
+      return (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          {estados.map((estado, idx) => (
+            <React.Fragment key={idx}>
+              <span style={{ 
+                color: ESTADO_COLORS[estado.replace(/ /g, '_')] || '#374151',
+                fontWeight: '700',
+                textTransform: 'uppercase',
+                fontSize: '12px'
+              }}>
+                {estado}
+              </span>
+              {idx < estados.length - 1 && <span style={{ color: '#9CA3AF' }}>→</span>}
+            </React.Fragment>
+          ))}
+        </div>
+      );
+    }
+
+    return detalle;
   };
 
   const renderDetalleMotivo = () => {

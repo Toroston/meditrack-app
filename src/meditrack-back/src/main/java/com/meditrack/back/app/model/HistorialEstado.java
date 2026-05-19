@@ -1,6 +1,17 @@
 package com.meditrack.back.app.model;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "historial_estados")
@@ -20,9 +31,9 @@ public class HistorialEstado {
     private String hora;
     private String usuario;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "envio_id", nullable = false)
-    @com.fasterxml.jackson.annotation.JsonIgnore // evita loop infinito al serializar
+    @JsonIgnoreProperties("historial")
     private Envio envio;
 
     public HistorialEstado() {}

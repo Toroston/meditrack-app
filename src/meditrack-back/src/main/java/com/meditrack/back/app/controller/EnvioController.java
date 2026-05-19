@@ -63,10 +63,7 @@ public class EnvioController {
     public ResponseEntity<?> obtenerPorId(@PathVariable String id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
         try {
             autenticar(authHeader);
-            Envio envio = envioService.listarTodos().stream()
-                    .filter(e -> e.getId().equals(id))
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Envío no encontrado"));
+            Envio envio = envioService.buscarPorId(id);
             return ResponseEntity.ok(envio);
         } catch (RuntimeException e) {
             if (e.getMessage().contains("no encontrado")) {
@@ -77,7 +74,7 @@ public class EnvioController {
     }
 
     @PostMapping
-    public ResponseEntity<?> crear(@RequestBody Map<String, String> body, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+    public ResponseEntity<?> crear(@RequestBody Envio body, @RequestHeader(value = "Authorization", required = false) String authHeader) {
         try {
             Sesion sesion = autenticar(authHeader);
             if (sesion.getRole() != Role.SUPERVISOR) {
@@ -91,7 +88,7 @@ public class EnvioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> actualizar(@PathVariable String id, @RequestBody Map<String, String> body, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+    public ResponseEntity<?> actualizar(@PathVariable String id, @RequestBody Envio body, @RequestHeader(value = "Authorization", required = false) String authHeader) {
         try {
             Sesion sesion = autenticar(authHeader);
             if (sesion.getRole() != Role.SUPERVISOR) {
@@ -125,16 +122,13 @@ public class EnvioController {
     }
 
     @PutMapping("/{id}/reasignar")
-    public ResponseEntity<?> reasignarRepartidor(@PathVariable String id,@RequestBody Map<String, String> body,@RequestHeader(value = "Authorization", required = false) String authHeader) {
+    public ResponseEntity<?> reasignarRepartidor(@PathVariable String id, @RequestBody Map<String, String> body, @RequestHeader(value = "Authorization", required = false) String authHeader) {
         try {
             Sesion sesion = autenticar(authHeader);
-
             if (sesion.getRole() == Role.REPARTIDOR) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "Los repartidores no pueden reasignar envíos"));
             }
-
             String nuevoRepartidorId = body.get("repartidorId");
-
             return ResponseEntity.ok(envioService.reasignarRepartidor(id, nuevoRepartidorId, sesion.getNombre()));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
@@ -144,28 +138,20 @@ public class EnvioController {
     }
 
     @GetMapping("/{id}/etiqueta")
-    public ResponseEntity<?> descargarEtiqueta(@PathVariable String id,@RequestHeader(value = "Authorization", required = false) String authHeader) {
+    public ResponseEntity<?> descargarEtiqueta(@PathVariable String id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
         try {
             autenticar(authHeader);
-
             Envio envio = envioService.buscarPorId(id);
-
             byte[] pdf = etiquetaService.generarEtiqueta(envio);
-
             String filename = "etiqueta-" + envio.getId() + ".pdf";
-
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE)
-                    .header(HttpHeaders.CONTENT_DISPOSITION,
-                            "attachment; filename=\"" + filename + "\"")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
                     .body(pdf);
-
         } catch (RuntimeException e) {
-
             if (e.getMessage() != null && e.getMessage().contains("no encontrado")) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Envío no encontrado"));
             }
-
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
         }
     }
@@ -177,15 +163,12 @@ public class EnvioController {
             if (sesion.getRole() != Role.SUPERVISOR) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "Sin permisos para cancelar envíos"));
             }
-
             String fecha = body.getOrDefault("fecha", LocalDate.now().toString());
             String hora = body.getOrDefault("hora", LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
             String motivo = body.getOrDefault("motivo", "");
             String firma = body.getOrDefault("firma", "");
             String usuario = sesion.getNombre();
-
             return ResponseEntity.ok(envioService.cancelar(id, motivo, firma, fecha, hora, usuario));
-
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
         } catch (RuntimeException e) {
@@ -195,5 +178,4 @@ public class EnvioController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
         }
     }
-    
 }

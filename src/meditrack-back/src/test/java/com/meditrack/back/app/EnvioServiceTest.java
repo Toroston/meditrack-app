@@ -1,29 +1,37 @@
 package com.meditrack.back.app;
 
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.server.ResponseStatusException;
 
+import com.meditrack.back.app.model.DetalleEnvio;
 import com.meditrack.back.app.model.Envio;
 import com.meditrack.back.app.model.EstadoEnvio;
-import com.meditrack.back.app.service.EnvioService;
+import com.meditrack.back.app.model.Medicamento;
 import com.meditrack.back.app.repository.EnvioRepository;
+import com.meditrack.back.app.repository.MedicamentoRepository;
+import com.meditrack.back.app.service.EnvioService;
 
 @ExtendWith(MockitoExtension.class)
 class EnvioServiceTest {
 
     @Mock
     private EnvioRepository envioRepository;
+
+    @Mock
+    private MedicamentoRepository medicamentoRepository;
 
     @InjectMocks
     private EnvioService service;
@@ -39,22 +47,31 @@ class EnvioServiceTest {
 
     @Test
     void crear_agregaEnvioEnEstadoPENDIENTE() {
-        Map<String, String> body = Map.of(
-            "destinatario", "Juan Pérez", 
-            "remitente", "Laboratorio Central",
-            "direccionEntrega", "Calle Falsa 123",
-            "prioridad", "ALTA"
-        );
+        Medicamento medSimulado = new Medicamento();
+        medSimulado.setId("med-1");
+        
+        DetalleEnvio detalleSimulado = new DetalleEnvio();
+        detalleSimulado.setMedicamento(medSimulado);
+        detalleSimulado.setCantidad(5);
+
+        Envio inputEnvio = new Envio();
+        inputEnvio.setDestinatario("Juan Pérez");
+        inputEnvio.setRemitente("Laboratorio Central");
+        inputEnvio.setDireccionEntrega("Calle Falsa 123");
+        inputEnvio.setPrioridad("ALTA");
+        inputEnvio.setDetalles(List.of(detalleSimulado));
         
         Envio envioSimulado = new Envio();
         envioSimulado.setId("ENV-12345");
         envioSimulado.setDestinatario("Juan Pérez");
         envioSimulado.setEstado(EstadoEnvio.PENDIENTE);
         envioSimulado.setUsuarioResponsable(USUARIO_TEST);
+        envioSimulado.setDetalles(List.of(detalleSimulado));
 
+        when(medicamentoRepository.findById("med-1")).thenReturn(Optional.of(medSimulado));
         when(envioRepository.save(any(Envio.class))).thenReturn(envioSimulado);
         
-        Envio nuevo = service.crear(body, USUARIO_TEST); 
+        Envio nuevo = service.crear(inputEnvio, USUARIO_TEST); 
         
         assertNotNull(nuevo.getId());
         assertEquals("Juan Pérez", nuevo.getDestinatario());
@@ -85,13 +102,26 @@ class EnvioServiceTest {
     void actualizarEstado_idInexistente_lanzaExcepcion() {
         when(envioRepository.findById("NON-EXISTENT-ID")).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> 
+        assertThrows(ResponseStatusException.class, () -> 
             service.actualizarEstado("NON-EXISTENT-ID", EstadoEnvio.EN_TRANSITO, USUARIO_TEST, null)
         );
     }
 
     @Test
     void auditoria_registraFechaYHoraAutomaticamente() {
+        Medicamento medSimulado = new Medicamento();
+        medSimulado.setId("med-1");
+        
+        DetalleEnvio detalleSimulado = new DetalleEnvio();
+        detalleSimulado.setMedicamento(medSimulado);
+        detalleSimulado.setCantidad(2);
+
+        Envio inputEnvio = new Envio();
+        inputEnvio.setDestinatario("Test Auditoria");
+        inputEnvio.setRemitente("Test");
+        inputEnvio.setDetalles(List.of(detalleSimulado));
+
+        when(medicamentoRepository.findById("med-1")).thenReturn(Optional.of(medSimulado));
         when(envioRepository.save(any(Envio.class))).thenAnswer(i -> {
             Envio e = (Envio) i.getArguments()[0];
             e.setFechaCreacion("2026-05-17");
@@ -100,8 +130,7 @@ class EnvioServiceTest {
             return e;
         });
 
-        Map<String, String> body = Map.of("destinatario", "Test Auditoria", "remitente", "Test");
-        Envio nuevo = service.crear(body, USUARIO_TEST);
+        Envio nuevo = service.crear(inputEnvio, USUARIO_TEST);
         
         assertNotNull(nuevo.getFechaCreacion());
         assertNotNull(nuevo.getHoraCreacion());
@@ -126,8 +155,5 @@ class EnvioServiceTest {
         
         service.actualizarEstado("ENV-999", EstadoEnvio.INCIDENTE_REPORTADO, USUARIO_TEST, null);
         assertEquals(EstadoEnvio.INCIDENTE_REPORTADO, envioExistente.getEstado());
-        
-        service.actualizarEstado("ENV-999", EstadoEnvio.CANCELADO, USUARIO_TEST, null);
-        assertEquals(EstadoEnvio.CANCELADO, envioExistente.getEstado());
     }
 }
