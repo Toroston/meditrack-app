@@ -18,7 +18,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final UsuarioService usuarioService;
     private final UsuarioRepository usuarioRepository;
-    
+
     private final Map<String, Map<String, Object>> resetCodes = new HashMap<>();
     private final Map<String, String> codigos2faActivos = new HashMap<>();
 
@@ -31,11 +31,11 @@ public class AuthService {
     public Map<String, Object> login(String email, String password) {
         Usuario usuario = usuarioService.buscarPorEmail(email)
             .orElseThrow(() -> new RuntimeException("Credenciales inválidas"));
-            
-        if (!usuario.getPassword().equals(password)) {
+
+        if (!usuarioService.verificarPassword(password, usuario.getPassword())) {
             throw new RuntimeException("Credenciales inválidas");
         }
-        
+
         if (!usuario.isEstadoActivo()) {
             throw new RuntimeException("Usuario inactivo. Contacte a un administrador.");
         }
@@ -43,16 +43,16 @@ public class AuthService {
         if (usuario.getRole() == Role.ADMINISTRADOR) {
             String codigo2fa = String.format("%06d", new Random().nextInt(999999));
             codigos2faActivos.put(usuario.getEmail(), codigo2fa);
-            
+
             return Map.of(
                 "require2fa", true,
                 "email", usuario.getEmail(),
-                "mockCode", codigo2fa 
+                "mockCode", codigo2fa
             );
         }
-        
+
         String token = jwtUtil.generarToken(usuario.getId(), usuario.getEmail(), usuario.getNombre(), usuario.getRole());
-        
+
         return Map.of(
             "require2fa", false,
             "token",  token,
@@ -65,7 +65,7 @@ public class AuthService {
 
     public Map<String, Object> verificar2fa(String email, String codigo) {
         String codigoGuardado = codigos2faActivos.get(email);
-        
+
         if (codigoGuardado == null || !codigoGuardado.equals(codigo)) {
             throw new RuntimeException("Código de seguridad incorrecto o expirado");
         }
@@ -93,7 +93,7 @@ public class AuthService {
 
     public Map<String, String> solicitarReset(String email) {
         boolean existe = usuarioService.buscarPorEmail(email).isPresent();
-        
+
         if (!existe) {
             throw new RuntimeException("El correo no se encuentra registrado en la base de datos");
         }
@@ -104,7 +104,7 @@ public class AuthService {
         resetCodes.put(email, Map.of("code", codigo, "expiresAt", expira));
 
         System.out.println("[MOCK EMAIL] Codigo para " + email + ": " + codigo);
-        
+
         return Map.of(
             "mensaje", "Codigo enviado (mock)",
             "codigo", codigo
@@ -119,7 +119,7 @@ public class AuthService {
         }
 
         long expira = (long) datos.get("expiresAt");
-        
+
         if (System.currentTimeMillis() > expira) {
             resetCodes.remove(email);
             throw new RuntimeException("El codigo ha expirado");
@@ -136,11 +136,11 @@ public class AuthService {
         Usuario usuario = usuarioService.buscarPorEmail(email)
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        usuario.setPassword(nuevaPassword);
-        usuarioRepository.save(usuario); 
-        
+        usuario.setPassword(usuarioService.hashearPassword(nuevaPassword));
+        usuarioRepository.save(usuario);
+
         resetCodes.remove(email);
-        
+
         System.out.println("[TRAZABILIDAD] Contraseña reseteada para: " + email);
     }
 }
