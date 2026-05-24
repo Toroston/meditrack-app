@@ -6,7 +6,10 @@
   padding: 0;
 }
 
-h1, h2, h3, h4,
+h1,
+h2,
+h3,
+h4,
 .navbar-brand,
 .login-title,
 .login-subtitle,
@@ -722,4 +725,55 @@ input:checked+.slider:before {
   padding: 12px;
   border: 1px solid var(--border-color);
   border-radius: 8px;
+}
+
+.mt-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 22px;
+}
+
+.mt-switch input {
+  display: none;
+}
+
+.mt-slider {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  background: #d1d5db;
+  border-radius: 999px;
+  transition: .2s;
+}
+
+.mt-slider:before {
+  content: "";
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  top: 2px;
+  background: #fff;
+  border-radius: 999px;
+  transition: .2s;
+}
+
+.mt-switch input:checked+.mt-slider {
+  background: #10b981;
+}
+
+.mt-switch input:checked+.mt-slider:before {
+  transform: translateX(20px);
+}
+
+.mt-switch input:disabled+.mt-slider {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+/* SOLO para la celda Estado en Transportes */
+.mt-estado-cell,
+.mt-estado-cell * {
+  caret-color: transparent; /* mata el cursor | */
 }
