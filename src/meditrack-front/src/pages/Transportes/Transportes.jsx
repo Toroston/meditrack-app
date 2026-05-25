@@ -63,7 +63,9 @@ function Transportes() {
         };
         fetchInitial();
 
-    }, []);
+    },[]);
+
+
 
     const transportesFiltrados = useMemo(() => {
         const term = busqueda.toLowerCase().trim();
@@ -85,6 +87,7 @@ function Transportes() {
             patente: '',
             tipoVehiculo: '',
             capacidadKg: '',
+            capacidadLitros: '',
             estadoOperativo: 'ACTIVO',
         });
         setError('');
@@ -111,6 +114,7 @@ function Transportes() {
         setModalAbierto(false);
         setModoEdicion(false);
         setIdEditando(null);
+        setErrorModal('');
     };
 
     const validarForm = () => {
@@ -182,6 +186,7 @@ function Transportes() {
             setError(e.message || 'Error al actualizar estado');
         }
     };
+
     const getEstadoStyle = (estado) => {
         const color = ESTADO_COLORS[estado] || '#6b7280';
         return {

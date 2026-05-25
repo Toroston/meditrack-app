@@ -44,18 +44,18 @@ export async function logout() {
 }
 
 export const verify2fa = async (email, codigo) => {
-    const response = await fetch(`${BASE_URL}/auth/verify-2fa`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, codigo }),
-    });
+  const response = await fetch(`${BASE_URL}/auth/verify-2fa`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, codigo }),
+  });
 
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Error al verificar el código 2FA');
-    }
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Error al verificar el código 2FA');
+  }
 
-    return response.json();
+  return response.json();
 };
 
 export async function forgotPassword(email) {
@@ -275,7 +275,7 @@ export async function updateUsuario(id, data) {
     email: data.email,
     role: data.role
   };
-  
+
   if (data.password && data.password.trim() !== '') {
     dataLimpia.password = data.password;
   }
@@ -287,13 +287,13 @@ export async function updateUsuario(id, data) {
   });
 
   await handleResponse(res);
-  
+
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error || 'Error al actualizar usuario');
   }
-  
-  return res.json(); 
+
+  return res.json();
 }
 
 // --- Medicamentos (stubs — conectar cuando exista el modelo) ---
@@ -363,7 +363,7 @@ export async function inactivarMedicamento(id) {
       'Content-Type': 'application/json',
       ...getAuthHeaders(),
     },
-    body: JSON.stringify({}) 
+    body: JSON.stringify({})
   });
 
   await handleResponse(res);
@@ -387,6 +387,7 @@ export async function toggleEstadoUsuario(id) {
     throw new Error(err.error || 'Error al cambiar estado del usuario');
   }
 }
+
 
 export async function getRutas() {
   const res = await fetch(`${BASE_URL}/api/rutas?_t=${Date.now()}`, {
@@ -464,8 +465,8 @@ export async function getTrackingPublico(id) {
 
 
     const limpio =
-    !msgFromJson || msgFromJson.toLowerCase() === "not found"
-    ? null: msgFromJson;
+      !msgFromJson || msgFromJson.toLowerCase() === "not found"
+        ? null : msgFromJson;
 
     throw new Error(limpio || msgByStatus);
   }
@@ -520,80 +521,81 @@ export async function desactivarTransporte(id) {
   if (!res.ok) throw new Error(body.error || "Error al desactivar transporte");
   return body;
 }
+
 //Clientes
 export async function getClientes() {
-    const response = await fetch(`${BASE_URL}/api/clientes`,{
-            headers: { ...getAuthHeaders() },
-        }
-    );
+  const response = await fetch(`${BASE_URL}/api/clientes`, {
+    headers: { ...getAuthHeaders() },
+  }
+  );
 
-    if (!response.ok)
-        throw new Error('Error al obtener clientes');
-    
-    return response.json();
+  if (!response.ok)
+    throw new Error('Error al obtener clientes');
+
+  return response.json();
 }
 
 export async function getClienteById(id) {
-    const response = await fetch(`${BASE_URL}/api/clientes/${id}`,
-        {
-            headers: { ...getAuthHeaders() },
-        }
-    );
+  const response = await fetch(`${BASE_URL}/api/clientes/${id}`,
+    {
+      headers: { ...getAuthHeaders() },
+    }
+  );
 
-    if (!response.ok)
-        throw new Error('Error al obtener cliente');
-    
-    return response.json();
+  if (!response.ok)
+    throw new Error('Error al obtener cliente');
+
+  return response.json();
 }
 
 export async function createCliente(cliente) {
-    const response = await fetch(`${BASE_URL}/api/clientes`,
-        {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-        body: JSON.stringify(cliente)
-      }
-    );
+  const response = await fetch(`${BASE_URL}/api/clientes`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+      body: JSON.stringify(cliente)
+    }
+  );
 
   if (!response.ok) {
     const error = await response.json();
-        throw new Error(error.error || 'Error al crear cliente');
-    }
+    throw new Error(error.error || 'Error al crear cliente');
+  }
 
-    return response.json();
+  return response.json();
 }
 
 export async function updateCliente(id, cliente) {
-    const response = await fetch(`${BASE_URL}/api/clientes/${id}`,
-        {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-            body: JSON.stringify(cliente)
-        }
-    );
-
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error ||'Error al actualizar cliente');
+  const response = await fetch(`${BASE_URL}/api/clientes/${id}`,
+    {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+      body: JSON.stringify(cliente)
     }
+  );
 
-    return response.json();
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'Error al actualizar cliente');
+  }
+
+  return response.json();
 }
 
 export async function cambiarEstadoCliente(id) {
-    const response = await fetch(`${BASE_URL}/api/clientes/${id}/cambiarEstado`,
-        {
-            method: 'PUT',
-            headers: { ...getAuthHeaders() },
-        }
-    );
-
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Error al cambiar estado');
+  const response = await fetch(`${BASE_URL}/api/clientes/${id}/cambiarEstado`,
+    {
+      method: 'PUT',
+      headers: { ...getAuthHeaders() },
     }
+  );
 
-    return response.json();
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'Error al cambiar estado');
+  }
+
+  return response.json();
 }
 
 export async function getReporte({ tema, fechaInicio, fechaFin, granularidad }) {
