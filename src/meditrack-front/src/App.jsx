@@ -26,6 +26,7 @@ import NuevoCliente from './pages/Clientes/NuevoCliente';
 import EditarCliente from './pages/Clientes/EditarCliente';
 import Transportes from './pages/Transportes/Transportes';
 import Reportes from './pages/Reportes/Reportes';
+import DashboardKPI from './pages/Reportes/DashboardKPI';
 import { LoadScript } from "@react-google-maps/api";
 
 
@@ -62,6 +63,7 @@ function App() {
               <Route path="/clientes/nuevo" element={<ProtectedRoute roles={['SUPERVISOR', 'ADMINISTRADOR']}><NuevoCliente /></ProtectedRoute>} />
               <Route path="/clientes/editar/:id" element={<ProtectedRoute roles={['SUPERVISOR', 'ADMINISTRADOR']}> <EditarCliente /></ProtectedRoute>} />
               <Route path="/reportes" element={<ProtectedRoute roles={['SUPERVISOR', 'ADMINISTRADOR']}><Reportes /></ProtectedRoute>} />
+              <Route path="/kpis" element={<ProtectedRoute roles={['SUPERVISOR', 'ADMINISTRADOR']}><DashboardKPI /></ProtectedRoute>} />
               <Route path="/transportes" element={<ProtectedRoute roles={['ADMINISTRADOR']}><Transportes /></ProtectedRoute>} />
             </Route>
             <Route path="*" element={<Navigate to="/menu" replace />} />

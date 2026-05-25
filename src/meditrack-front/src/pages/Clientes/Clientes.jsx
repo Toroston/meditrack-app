@@ -17,16 +17,16 @@ function Clientes() {
     const navigate = useNavigate();
 
     useEffect(() => {
-  getClientes()
-    .then(data => {
-      setClientes(data);
-      setLoading(false);
-    })
-    .catch(err => {
-      console.error(err);
-      setLoading(false);
-    });
-}, []);
+        getClientes()
+            .then(data => {
+                setClientes(data);
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error(err);
+                setLoading(false);
+            });
+    }, []);
 
     const handleInactivar = async (id) => {
         try {
@@ -188,7 +188,7 @@ function Clientes() {
                                                 <Skeleton width="42px" height="42px" borderRadius="50%" />
                                                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
                                                     <Skeleton width="140px" height="16px" />
-                                                    <Skeleton width="200px" height="12px" />
+                                                    <Skeleton width="200px" height="12px" className="mobile-hidden" />
                                                 </div>
                                             </div>
                                         </td>
@@ -226,7 +226,7 @@ function Clientes() {
                                                         <div style={{ fontWeight: '700', color: '#111827' }}>
                                                             {c.nombre}
                                                         </div>
-                                                        <div style={{
+                                                        <div className="mobile-hidden" style={{
                                                             fontSize: '13px',
                                                             color: '#6B7280',
                                                             maxWidth: '320px',

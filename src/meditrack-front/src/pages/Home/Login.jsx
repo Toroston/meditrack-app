@@ -100,7 +100,7 @@ function Login() {
         overflowY: 'auto',
         boxSizing: 'border-box'
     }}>
-      <Navbar buttonText="VOLVER" buttonRoute="/tracking" />
+      <Navbar buttonText="VOLVER" buttonRoute="/" />
       
       <div style={{
           maxWidth: 450, 

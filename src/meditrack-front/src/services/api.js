@@ -615,3 +615,8 @@ export async function getReporte({ tema, fechaInicio, fechaFin, granularidad }) 
   return res.json();
 }
 
+export const getKpisDashboard = async (historico = false) => {
+    const response = await fetch(`${BASE_URL}/api/kpis/dashboard?historico=${historico}`);
+    if (!response.ok) throw new Error('Error al obtener las métricas');
+    return await response.json();
+};
