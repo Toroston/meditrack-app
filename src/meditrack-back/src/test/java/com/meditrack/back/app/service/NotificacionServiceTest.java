@@ -1,4 +1,4 @@
-package com.meditrack.back.app;
+package com.meditrack.back.app.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -51,9 +51,8 @@ class NotificacionServiceTest {
 
     @Test
     void crearNotificacion_conUsuarioNulo_lanzaExcepcion() {
-        assertThrows(IllegalArgumentException.class, () -> 
-            service.crearNotificacion(null, "Título Test", "Mensaje Test")
-        );
+        assertThrows(IllegalArgumentException.class,
+                () -> service.crearNotificacion(null, "Título Test", "Mensaje Test"));
     }
 
     @Test
@@ -63,7 +62,7 @@ class NotificacionServiceTest {
         Notificacion n2 = new Notificacion(usuario, "C", "D");
 
         when(notificacionRepository.findByUsuarioDestinoOrderByFechaCreacionDesc(usuario))
-            .thenReturn(List.of(n1, n2));
+                .thenReturn(List.of(n1, n2));
 
         List<Notificacion> list = service.listarPorUsuario(usuario);
 
@@ -100,9 +99,7 @@ class NotificacionServiceTest {
 
         when(notificacionRepository.findById("NOT-999")).thenReturn(Optional.of(n));
 
-        assertThrows(RuntimeException.class, () ->
-            service.marcarComoLeida("NOT-999", intruder)
-        );
+        assertThrows(RuntimeException.class, () -> service.marcarComoLeida("NOT-999", intruder));
     }
 
     @Test
@@ -112,7 +109,7 @@ class NotificacionServiceTest {
         Notificacion n2 = new Notificacion(usuario, "C", "D");
 
         when(notificacionRepository.findByUsuarioDestinoOrderByFechaCreacionDesc(usuario))
-            .thenReturn(List.of(n1, n2));
+                .thenReturn(List.of(n1, n2));
 
         service.marcarTodasComoLeidas(usuario);
 
@@ -124,7 +121,7 @@ class NotificacionServiceTest {
     @Test
     void obtenerCantidadSinLeer_retornaRecuento() {
         Usuario usuario = new Usuario("user@test.com", "User Test", "12345678", "password", Role.REPARTIDOR);
-        
+
         when(notificacionRepository.countByUsuarioDestinoAndLeidoFalse(usuario)).thenReturn(5L);
 
         long count = service.obtenerCantidadSinLeer(usuario);

@@ -26,6 +26,15 @@ jobs:
 
       - name: Build & run tests
         working-directory: src/meditrack-back
+        env:
+            SPRING_DATASOURCE_TEST_URL: ${{ secrets.SPRING_DATASOURCE_TEST_URL }}
+            SPRING_DATASOURCE_TEST_USERNAME: ${{ secrets.SPRING_DATASOURCE_TEST_USERNAME }}
+            SPRING_DATASOURCE_TEST_PASSWORD: ${{ secrets.SPRING_DATASOURCE_TEST_PASSWORD }}
+            CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+            CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+            CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+            JWT_SECRET: ${{ secrets.JWT_SECRET }}
+            JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
         run: |
           chmod +x mvnw
           ./mvnw clean verify

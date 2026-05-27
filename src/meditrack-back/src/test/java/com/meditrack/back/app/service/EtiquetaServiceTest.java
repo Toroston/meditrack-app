@@ -1,4 +1,4 @@
-package com.meditrack.back.app;
+package com.meditrack.back.app.service;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;

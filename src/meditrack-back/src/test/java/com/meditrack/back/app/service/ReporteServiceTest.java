@@ -1,4 +1,4 @@
-package com.meditrack.back.app;
+package com.meditrack.back.app.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -37,20 +37,21 @@ class ReporteServiceTest {
     @SuppressWarnings("unchecked")
     void generarReporteOperativo_volumen_retornaDatosCorrectamente() {
         List<Object[]> resultadosSimulados = new ArrayList<>();
-        resultadosSimulados.add(new Object[]{"2026-05-20", "ENTREGADO", 15L});
+        resultadosSimulados.add(new Object[] { "2026-05-20", "ENTREGADO", 15L });
 
         when(entityManager.createNativeQuery(anyString())).thenReturn(query);
         when(query.setParameter(anyString(), anyString())).thenReturn(query);
         when(query.getResultList()).thenReturn(resultadosSimulados);
 
-        Map<String, Object> reporte = reporteService.generarReporteOperativo("volumen", "2026-05-01", "2026-05-31", "diaria");
+        Map<String, Object> reporte = reporteService.generarReporteOperativo("volumen", "2026-05-01", "2026-05-31",
+                "diaria");
 
         assertNotNull(reporte);
         assertEquals("volumen", reporte.get("tipo"));
-        
+
         List<Map<String, Object>> data = (List<Map<String, Object>>) reporte.get("data");
         assertEquals(1, data.size());
-        
+
         Map<String, Object> fila = data.get(0);
         assertEquals("2026-05-20", fila.get("periodo"));
         assertEquals("ENTREGADO", fila.get("estado"));
@@ -61,21 +62,22 @@ class ReporteServiceTest {
     @SuppressWarnings("unchecked")
     void generarReporteOperativo_entregas_retornaDatosCorrectamente() {
         List<Object[]> resultadosTotalSimulados = new ArrayList<>();
-        resultadosTotalSimulados.add(new Object[]{"2026-05-20", 10L});
+        resultadosTotalSimulados.add(new Object[] { "2026-05-20", 10L });
 
         when(entityManager.createNativeQuery(anyString())).thenReturn(query);
         when(query.setParameter(anyString(), anyString())).thenReturn(query);
         when(query.getResultList()).thenReturn(resultadosTotalSimulados);
         when(query.getSingleResult()).thenReturn(8L);
 
-        Map<String, Object> reporte = reporteService.generarReporteOperativo("entregas", "2026-05-01", "2026-05-31", "diaria");
+        Map<String, Object> reporte = reporteService.generarReporteOperativo("entregas", "2026-05-01", "2026-05-31",
+                "diaria");
 
         assertNotNull(reporte);
         assertEquals("entregas", reporte.get("tipo"));
-        
+
         List<Map<String, Object>> data = (List<Map<String, Object>>) reporte.get("data");
         assertEquals(1, data.size());
-        
+
         Map<String, Object> fila = data.get(0);
         assertEquals("2026-05-20", fila.get("periodo"));
         assertEquals(10L, fila.get("totalEnvios"));
@@ -87,20 +89,22 @@ class ReporteServiceTest {
     @SuppressWarnings("unchecked")
     void generarReporteOperativo_incidencias_retornaDatosCorrectamente() {
         List<Object[]> resultadosSimulados = new ArrayList<>();
-        resultadosSimulados.add(new Object[]{"2026-05-20", "FALLA_MECANICA", "Diego Torres", "INCIDENTE_REPORTADO", "Problema en motor"});
+        resultadosSimulados.add(new Object[] { "2026-05-20", "FALLA_MECANICA", "Diego Torres", "INCIDENTE_REPORTADO",
+                "Problema en motor" });
 
         when(entityManager.createNativeQuery(anyString())).thenReturn(query);
         when(query.setParameter(anyString(), anyString())).thenReturn(query);
         when(query.getResultList()).thenReturn(resultadosSimulados);
 
-        Map<String, Object> reporte = reporteService.generarReporteOperativo("incidencias", "2026-05-01", "2026-05-31", "diaria");
+        Map<String, Object> reporte = reporteService.generarReporteOperativo("incidencias", "2026-05-01", "2026-05-31",
+                "diaria");
 
         assertNotNull(reporte);
         assertEquals("incidencias", reporte.get("tipo"));
-        
+
         List<Map<String, Object>> data = (List<Map<String, Object>>) reporte.get("data");
         assertEquals(1, data.size());
-        
+
         Map<String, Object> fila = data.get(0);
         assertEquals("2026-05-20", fila.get("periodo"));
         assertEquals("FALLA_MECANICA", fila.get("tipo"));
@@ -111,9 +115,8 @@ class ReporteServiceTest {
 
     @Test
     void generarReporteOperativo_temaInvalido_lanzaExcepcion() {
-        assertThrows(IllegalArgumentException.class, () -> 
-            reporteService.generarReporteOperativo("tema_invalido", "2026-05-01", "2026-05-31", "diaria")
-        );
+        assertThrows(IllegalArgumentException.class,
+                () -> reporteService.generarReporteOperativo("tema_invalido", "2026-05-01", "2026-05-31", "diaria"));
     }
 
 }
