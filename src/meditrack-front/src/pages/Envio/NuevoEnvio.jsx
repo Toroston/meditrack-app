@@ -26,6 +26,7 @@ function NuevoEnvio() {
   const [loteMed, setLoteMed] = useState('');
   const [vencimientoMed, setVencimientoMed] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -131,6 +132,8 @@ function NuevoEnvio() {
   };
 
   const handleGuardar = async () => {
+    if (loading) return;
+
     const camposAValidar = ['remitente', 'destinatario', 'origen', 'destino', 'fechaEstimada'];
     const hayCamposVacios = camposAValidar.some(key => !form[key]?.trim());
 
@@ -145,6 +148,9 @@ function NuevoEnvio() {
     }
 
     const descripcionGenerada = itemsCarga.map(i => `${i.nombre} x${i.cantidad}`).join(', ');
+
+    setLoading(true);
+    setError('');
 
     try {
       const detallesEnvio = itemsCarga.map(item => ({
@@ -183,6 +189,7 @@ function NuevoEnvio() {
       navigate('/envios', { state: { success: true } });
     } catch (err) {
       setError(err.message || 'Error de conexión con el servidor.');
+      setLoading(false);
     }
   };
 
@@ -518,7 +525,9 @@ function NuevoEnvio() {
 
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '25px', paddingTop: '20px', borderTop: '1px solid #eee' }}>
           <button className="btn btn-secondary" onClick={() => navigate('/envios')}>CANCELAR</button>
-          <button className="btn btn-primary" onClick={handleGuardar}>CREAR ENVÍO</button>
+          <button className="btn btn-primary" onClick={handleGuardar} disabled={loading}>
+            {loading ? 'CREANDO...' : 'CREAR ENVÍO'}
+          </button>
         </div>
       </div>
     </div>
