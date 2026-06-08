@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getRutas, getUsuarios } from '../../services/api';
+import { getRutas, getUsuarios, getTransportes } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 
 const ESTADO_COLORS = {
@@ -14,15 +14,17 @@ function Rutas() {
   const [usuarios, setUsuarios] = useState([]);
   const [busqueda, setBusqueda] = useState('');
   const [loading, setLoading] = useState(true);
+  const [transportes, setTransportes] = useState([]);
 
   const navigate = useNavigate();
   const { user } = useAuth();
 
   useEffect(() => {
-    Promise.all([getRutas(), getUsuarios()])
-      .then(([rutasData, usuariosData]) => {
+    Promise.all([getRutas(), getUsuarios(), getTransportes('', '')])
+      .then(([rutasData, usuariosData, transportesData]) => {
         setRutas(rutasData);
         setUsuarios(usuariosData);
+        setTransportes(transportesData);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -32,6 +34,11 @@ function Rutas() {
     const u = usuarios.find(u => u.id === id);
     return u ? u.nombre : id;
   };
+
+  const getTransporte = (id) => {
+    const t = transportes.find(t => t.id === id);
+    return t ? `${t.patente} - ${t.tipoVehiculo}` : id;
+  }
 
   const rutasFiltradas = rutas.filter(r => {
     const term = busqueda.toLowerCase();
@@ -74,6 +81,7 @@ function Rutas() {
                 <th>ID Ruta</th>
                 <th>Fecha</th>
                 <th>Repartidor</th>
+                <th>Transporte</th>
                 <th>Estado</th>
                 <th style={{ textAlign: 'center' }}>Envíos</th>
                 <th style={{ textAlign: 'center' }}>Acciones</th>
@@ -82,7 +90,7 @@ function Rutas() {
             <tbody>
               {rutasFiltradas.length === 0 ? (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
+                  <td colSpan={7} style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
                     No hay rutas registradas
                   </td>
                 </tr>
@@ -92,6 +100,7 @@ function Rutas() {
                     <td style={{ fontWeight: 'bold', color: '#2563EB' }}>{r.id}</td>
                     <td>{r.fecha}</td>
                     <td>{getNombreRepartidor(r.repartidorId)}</td>
+                    <td>{getTransporte(r.transporteId)}</td>
                     <td>
                       <span
                         className="status-tag"

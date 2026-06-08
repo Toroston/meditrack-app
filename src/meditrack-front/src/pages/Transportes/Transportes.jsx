@@ -233,7 +233,7 @@ function Transportes() {
                 <div className="table-header-actions" style={{ padding: '10px' }}>
                     <div className="filters-left">
                         <div className="search-wrapper">
-                            <button 
+                            <button
                                 type="button"
                                 onClick={() => setSearchExpanded(!searchExpanded)}
                                 style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
@@ -275,6 +275,9 @@ function Transportes() {
                     </p>
                 )}
 
+                {loading ? (
+                    <p style={{ padding: '20px', color: '#6b7280' }}>Cargando transportes...</p>
+                ) : (
                 <div className="table-responsive-container">
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                         <thead>
@@ -288,18 +291,7 @@ function Transportes() {
                             </tr>
                         </thead>
                         <tbody>
-                            {loading ? (
-                                [1, 2, 3, 4, 5].map((n) => (
-                                    <tr key={n}>
-                                        <td><div className="skeleton-row" style={{ width: '80px' }}></div></td>
-                                        <td><div className="skeleton-row" style={{ width: '100px' }}></div></td>
-                                        <td className="col-ocultar"><div className="skeleton-row" style={{ width: '60px', margin: '0 auto' }}></div></td>
-                                        <td className="col-ocultar"><div className="skeleton-row" style={{ width: '60px', margin: '0 auto' }}></div></td>
-                                        <td className="col-estado"><div className="skeleton-row" style={{ width: '90px' }}></div></td>
-                                        <td><div className="skeleton-row" style={{ width: '40px', margin: '0 auto' }}></div></td>
-                                    </tr>
-                                ))
-                            ) : transportesFiltrados.length === 0 ? (
+                            {transportesFiltrados.length === 0 ? (
                                 <tr>
                                     <td colSpan={6} style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
                                         No hay transportes registrados
@@ -352,8 +344,8 @@ function Transportes() {
                         </tbody>
                     </table>
                 </div>
+                )}
             </div>
-
             {modalAbierto && (
                 <div className="modal-overlay">
                     <div className="modal-content">
@@ -429,6 +421,7 @@ function Transportes() {
             )}
         </div>
     );
+
 }
 
 export default Transportes;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getRutaById, getUsuarios, finalizarRuta } from '../../services/api';
+import { getRutaById, getUsuarios, getTransportes, finalizarRuta } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import MapaRuta from '../../components/MapaRuta';
 
@@ -47,12 +47,14 @@ function DetalleRuta() {
   const [error, setError] = useState('');
   const [finalizando, setFinalizando] = useState(false);
   const [confirmando, setConfirmando] = useState(false);
+  const [transportes, setTransportes] = useState([]);
 
   useEffect(() => {
-    Promise.all([getRutaById(id), getUsuarios()])
-      .then(([rutaData, usuariosData]) => {
+    Promise.all([getRutaById(id), getUsuarios(), getTransportes('', '')])
+      .then(([rutaData, usuariosData, transportesData]) => {
         setRuta(rutaData);
         setUsuarios(usuariosData);
+        setTransportes(transportesData);
       })
       .catch(() => setError('No se pudo cargar la ruta'))
       .finally(() => setLoading(false));
@@ -61,6 +63,11 @@ function DetalleRuta() {
   const getNombreRepartidor = (repId) => {
     const u = usuarios.find(u => u.id === repId);
     return u ? u.nombre : repId;
+  };
+
+  const getTransporte = (transporteId) => {
+    const t = transportes.find(t => t.id === transporteId);
+    return t ? `${t.patente} - ${t.tipoVehiculo}` : transporteId;
   };
 
   const handleFinalizar = async () => {
@@ -98,7 +105,7 @@ function DetalleRuta() {
       )}
 
       <div className="card" style={{ marginBottom: '24px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '25px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '25px' }}>
           <div className="detail-field">
             <label>ID RUTA</label>
             <span style={{ fontWeight: 'bold', color: '#2563EB' }}>{ruta?.id}</span>
@@ -114,6 +121,10 @@ function DetalleRuta() {
           <div className="detail-field">
             <label>REPARTIDOR</label>
             <span>{getNombreRepartidor(ruta?.repartidorId)}</span>
+          </div>
+          <div className="detail-field">
+            <label>TRANSPORTE</label>
+            <span>{getTransporte(ruta?.transporteId)}</span>
           </div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>

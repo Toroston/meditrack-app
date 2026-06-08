@@ -32,6 +32,7 @@ import Mails from './pages/Mails/Mails';
 import ReclamoCambioDatos from './pages/ReclamoCambioDato/ReclamoCambioDatos';
 import Repartidores from './pages/Usuarios/Repartidores';
 
+
 function App() {
   return (
     <LoadScript
@@ -67,7 +68,7 @@ function App() {
               <Route path="/clientes/editar/:id" element={<ProtectedRoute roles={['SUPERVISOR', 'ADMINISTRADOR']}> <EditarCliente /></ProtectedRoute>} />
               <Route path="/reportes" element={<ProtectedRoute roles={['SUPERVISOR', 'ADMINISTRADOR']}><Reportes /></ProtectedRoute>} />
               <Route path="/kpis" element={<ProtectedRoute roles={['SUPERVISOR', 'ADMINISTRADOR']}><DashboardKPI /></ProtectedRoute>} />
-              <Route path="/transportes" element={<ProtectedRoute roles={['ADMINISTRADOR']}><Transportes /></ProtectedRoute>} />
+              <Route path="/transportes" element={<ProtectedRoute roles={['ADMINISTRADOR', 'SUPERVISOR', 'REPARTIDOR']}><Transportes /></ProtectedRoute>} />
               <Route path="/mails" element={ <ProtectedRoute roles={['SUPERVISOR', 'ADMINISTRADOR']}><Mails /></ProtectedRoute> }/>
               <Route path="/repartidor" element={ <ProtectedRoute roles={['SUPERVISOR', 'ADMINISTRADOR']}><Repartidores /></ProtectedRoute> }/>
             </Route>

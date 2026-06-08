@@ -77,7 +77,7 @@ const MainMenu = () => {
     },
   ];
 
-  const filteredSections = menuSections.filter(section => 
+  const filteredSections = menuSections.filter(section =>
     section.rolesPermitidos.includes(userRole)
   );
 
@@ -88,19 +88,19 @@ const MainMenu = () => {
       minHeight: '100vh',
       fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif"
     }}>
-      <div style={{ 
-        display: 'flex', 
+      <div style={{
+        display: 'flex',
         flexWrap: 'wrap',
-        gap: '40px', 
+        gap: '40px',
         alignItems: 'flex-start'
       }}>
         {filteredSections.map((section, idx) => (
           <div key={idx} style={{ flex: '0 1 auto', marginBottom: '20px' }}>
-            <h2 style={{ 
-              fontSize: '12px', 
-              fontWeight: '800', 
-              color: '#374151', 
-              textTransform: 'uppercase', 
+            <h2 style={{
+              fontSize: '12px',
+              fontWeight: '800',
+              color: '#374151',
+              textTransform: 'uppercase',
               marginBottom: '20px',
               letterSpacing: '0.05em',
               display: 'flex',
@@ -110,10 +110,10 @@ const MainMenu = () => {
               <div style={{ width: '4px', height: '16px', backgroundColor: '#00A86B', borderRadius: '2px' }} />
               {section.title}
             </h2>
-            
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fill, 125px)', 
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, 125px)',
               gap: '12px',
               width: section.items.length > 1 ? '262px' : '125px'
             }}>
